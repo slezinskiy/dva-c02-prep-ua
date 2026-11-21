@@ -3,11 +3,11 @@
 **Домен 4 — Усунення несправностей та оптимізація** · питань: 26  
 Теорія: [01-domain1-development.md](../../01-domain1-development.md#network) · [Протиріччя](../../06-contradictions-and-traps.md) · [Застарілі/сумнівні відповіді](../../07-outdated-and-wrong-answers.md) · [Усі розділи](../README.md)
 
-> Тексти питань і пояснення — оригінальні англійською (на екзамені теж англійська). ✅ — правильна відповідь за ключем банку, ❌ — твоя минула помилкова відповідь. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
+> Тексти питань і варіантів — англійською (як на екзамені), пояснення — українською. ✅ — правильна відповідь за ключем банку. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
 
 <a id="t01-q32"></a>
 ### T01-Q32
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You are responsible for an application that runs on multiple Amazon EC2 instances. In front of the instances is an Internet-facing load balancer that takes requests from clients over the internet and distributes them to the EC2 instances. A health check is configured to ping the index.html page found in the root directory for the health status. When accessing the website via the internet visitors of the website receive timeout errors.
 
@@ -18,27 +18,16 @@ What should be checked first to resolve the issue?
 - ▫️ The application is down
 - ▫️ The ALB is warming up
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Security Groups»**
 
-Security Groups
+Security group — віртуальний фаєрвол EC2-інстансу: inbound-правила контролюють вхідний трафік, outbound — вихідний. Таймаути найчастіше означають заблокований доступ, тож перевір, чи є правило, що дозволяє вхідний трафік на потрібний порт.
 
-A security group acts as a virtual firewall for your EC2 instances to control incoming and outgoing traffic. Inbound rules control the incoming traffic to your instance, and outbound rules control the outgoing traffic from your instance.
-
-Check the security group rules of your EC2 instance. You need a security group rule that allows inbound traffic from your public IPv4 address on the proper port.
-
-Incorrect options:
-
-IAM Roles - Usually you run into issues with authorization of APIs with roles but not for timeout, so this option does not fit the given use-case.
-
-The application is down - Although you can set a health check for application ping or HTTP, timeouts are usually caused by blocked firewall access.
-
-The ALB is warming up - ALB has a slow start mode which allows a warm-up period before being able to respond to requests with optimal performance. So this is not the issue.
-
-Reference:
-
-https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConnecting.html#TroubleshootingInstancesConnectionTimeout
+**❌ Неправильні варіанти:**
+- *IAM Roles* — через ролі бувають помилки авторизації API, а не таймаути.
+- *The application is down* — можливо, але таймаути зазвичай спричинені заблокованим фаєрволом. Health check тут показує, що все гаразд.
+- *The ALB is warming up* — у ALB є slow start mode, але це не причина таймаутів.
 
 </details>
 
@@ -46,7 +35,7 @@ https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstancesConn
 
 <a id="t01-q36"></a>
 ### T01-Q36
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You are working with a t2.small instance bastion host that has the AWS CLI installed to help manage all the AWS services installed on it. You would like to know the security group and the instance id of the current instance.
 
@@ -57,19 +46,16 @@ Which of the following will help you fetch the needed information?
 - ▫️ Query the user data at http://254.169.254.169/latest/meta-data
 - ▫️ Create an IAM role and attach it to your EC2 instance that helps you perform a 'describe' API call
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Query the metadata at http://169.254.169.254/latest/meta-data»**
 
-Query the metadata at http://169.254.169.254/latest/meta-data - Because your instance metadata is available from your running instance, you do not need to use the Amazon EC2 console or the AWS CLI. This can be helpful when you're writing scripts to run from your instance. For example, you can access the local IP address of your instance from instance metadata to manage a connection to an external application. To view all categories of instance metadata from within a running instance, use the following URI - http://169.254.169.254/latest/meta-data/. The IP address 169.254.169.254 is a link-local address and is valid only from the instance. All instance metadata is returned as text (HTTP content type text/plain).
+Метадані доступні прямо із запущеного інстансу, тож консоль чи CLI не потрібні. Це зручно для скриптів на інстансі, наприклад щоб дізнатися локальну IP, instance id чи security groups. Адреса 169.254.169.254 — link-local, працює лише зсередини інстансу; метадані повертаються як текст (text/plain).
 
-Incorrect options:
-
-Create an IAM role and attach it to your EC2 instance that helps you perform a 'describe' API call - The AWS CLI has a describe-instances API call needs instance ID as an input. So, this will not work for the current use case wherein we do not know the instance ID.
-
-Query the user data at http://169.254.169.254/latest/user-data - This address retrieves the user data that you specified when launching your instance.
-
-Query the user data at http://254.169.254.169/latest/meta-data - The IP address specified is wrong.
+**❌ Неправильні варіанти:**
+- *Create an IAM role … to perform a 'describe' API call* — `describe-instances` потребує instance ID, якого ми не знаємо.
+- *Query the user data at …/latest/user-data* — повертає user data, задані при запуску, а не метадані.
+- *…http://254.169.254.169/latest/meta-data* — неправильна IP-адреса.
 
 Джерела: <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html> · <https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ec2/describe-instances.html>
 
@@ -79,7 +65,7 @@ Query the user data at http://254.169.254.169/latest/meta-data - The IP address 
 
 <a id="t02-q55"></a>
 ### T02-Q55
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A developer must identify the public IP addresses of clients connecting to Amazon EC2 instances behind a public Application Load Balancer (ALB). The EC2 instances run an HTTP server that logs all requests to a log file.
 
@@ -87,30 +73,19 @@ How can the developer ensure the client public IP addresses are captured in the 
 
 - ▫️ Install the Amazon CloudWatch Logs agent on the EC2 instances and configure logging.
 - ▫️ Install the AWS X-Ray daemon on the EC2 instances and configure request logging.
-- ❌ Configure the HTTP server to add the x-forwarded-proto request header to the logs.
+- ▫️ Configure the HTTP server to add the x-forwarded-proto request header to the logs.
 - ✅ Configure the HTTP server to add the x-forwarded-for request header to the logs.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-The X-Forwarded-For request header is automatically added and helps you identify the IP address of a client when you use an HTTP or HTTPS load balancer.
+**✅ Правильна відповідь: «Configure the HTTP server to add the x-forwarded-for request header to the logs»**
 
-Because load balancers intercept traffic between clients and servers, your server access logs contain only the IP address of the load balancer. To see the IP address of the client, use the X-Forwarded-For request header.
+Заголовок `X-Forwarded-For` балансер (HTTP/HTTPS) додає автоматично. Через балансер у логах сервера видно лише його IP, а справжню IP клієнта містить `X-Forwarded-For`. Треба налаштувати HTTP-сервер, щоб він писав цей заголовок у логи.
 
-The HTTP server may need to be configured to include the x-forwarded-for request header in the log files. Once this is done, the logs will contain the public IP addresses of the clients.
-
-CORRECT: "Configure the HTTP server to add the x-forwarded-for request header to the logs" is the correct answer (as explained above.)
-
-INCORRECT: "Configure the HTTP server to add the x-forwarded-proto request header to the logs" is incorrect.
-
-This request header identifies the protocol (HTTP or HTTPS).
-
-INCORRECT: "Install the AWS X-Ray daemon on the EC2 instances and configure request logging" is incorrect.
-
-X-Ray is used for tracing applications; it will not help identify the public IP addresses of clients.
-
-INCORRECT: "Install the Amazon CloudWatch Logs agent on the EC2 instances and configure logging" is incorrect.
-
-The Amazon CloudWatch Logs agent will send application and system logs to CloudWatch Logs. This does not help to capture the client IP addresses of connections.
+**❌ Неправильні варіанти:**
+- *x-forwarded-proto* — визначає протокол (HTTP чи HTTPS), а не IP.
+- *X-Ray daemon* — для трасування, IP клієнтів не дає.
+- *CloudWatch Logs agent* — пересилає логи в CloudWatch, але IP клієнтів у них від цього не з'являться.
 
 Джерела: <https://docs.aws.amazon.com/elasticloadbalancing/latest/application/x-forwarded-headers.html#x-forwarded-for>
 
@@ -120,7 +95,7 @@ The Amazon CloudWatch Logs agent will send application and system logs to CloudW
 
 <a id="t03-q46"></a>
 ### T03-Q46
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **Сесії між blue/green → зовнішнє сховище (ElastiCache).** → [детальніше](../../06-contradictions-and-traps.md#c01)
 
@@ -133,27 +108,16 @@ As a Developer Associate, what advice would you give to the company for resolvin
 - ▫️ Use multicast to replicate session information
 - ✅ Use ElastiCache to maintain user sessions
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Use ElastiCache to maintain user sessions»**
 
-Use ElastiCache to maintain user sessions
+ElastiCache — керовані in-memory сховища з високою пропускною здатністю й низькою затримкою; популярні для кешування, сесій, ігор, геосервісів, real-time аналітики. Щоб сесії були доступні з будь-якого веб-сервера, їх виносять в окреме key-value сховище (Redis або Memcached через ElastiCache). Тоді нові інстанси після blue/green-деплою бачать ті самі сесії.
 
-Amazon ElastiCache allows you to seamlessly set up, run, and scale popular open-Source compatible in-memory data stores in the cloud. Build data-intensive apps or boost the performance of your existing databases by retrieving data from high throughput and low latency in-memory data stores. Amazon ElastiCache is a popular choice for real-time use cases like Caching, Session Stores, Gaming, Geospatial Services, Real-Time Analytics, and Queuing.
-
-To address scalability and to provide a shared data storage for sessions that can be accessed from any individual web server, you can abstract the HTTP sessions from the web servers themselves. A common solution to for this is to leverage an In-Memory Key/Value store such as Redis and Memcached via ElastiCache.
-
- via - https://aws.amazon.com/caching/session-management/
-
-Incorrect options:
-
-Use rolling updates instead of a blue/green deployment - With rolling deployments, Elastic Beanstalk splits the environment's Amazon EC2 instances into batches and deploys the new version of the application to one batch at a time. It leaves the rest of the instances in the environment running the old version of the application. When processing a batch, Elastic Beanstalk detaches all instances in the batch from the load balancer, deploys the new application version, and then reattaches the instances.
-
-This means that some of the users can experience session disruptions when the instances maintaining the sessions were detached as part of the given batch. So this option is incorrect.
-
-Enable sticky sessions in the Application Load Balancer - As the Application Load Balancer itself is replaced on each new deployment, so maintaining sticky sessions via the Application Load Balancer will not work.
-
-Use multicast to replicate session information - This option has been added as a distractor.
+**❌ Неправильні варіанти:**
+- *Rolling updates instead of blue/green* — при rolling батч від'єднується від балансера на час деплою, і сесії на цих інстансах теж губляться.
+- *Sticky sessions in the ALB* — за умовою ALB замінюється при кожному деплої, тож stickiness не допоможе.
+- *Multicast to replicate session information* — дистрактор.
 
 Джерела: <https://aws.amazon.com/caching/session-management/> · <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html#environments-cfg-rollingdeployments-method>
 
@@ -163,7 +127,7 @@ Use multicast to replicate session information - This option has been added as a
 
 <a id="t07-q01"></a>
 ### T07-Q01
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You have an Auto Scaling group configured to a minimum capacity of 1 and a maximum capacity of 5, designed to launch EC2 instances across 3 Availability Zones. During a low utilization period, an entire Availability Zone went down and your application experienced downtime.
 
@@ -174,25 +138,16 @@ What can you do to ensure that your application remains highly available?
 - ✅ Increase the minimum instance capacity of the Auto Scaling Group to 2
 - ▫️ Configure ASG fast failover
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Increase the minimum instance capacity of the Auto Scaling Group to 2»**
 
-Increase the minimum instance capacity of the Auto Scaling Group to 2 -
+Розмір ASG задають через minimum, maximum і desired capacity. Minimum і maximum обов'язкові, а desired, якщо його не вказано, дорівнює minimum. З minimum = 1 працював лише один інстанс в одній AZ, і коли ця AZ впала, застосунок впав разом з нею. З minimum = 2 ASG розподілить інстанси по двох AZ, і застосунок стане високодоступним.
 
-You configure the size of your Auto Scaling group by setting the minimum, maximum, and desired capacity. The minimum and maximum capacity are required to create an Auto Scaling group, while the desired capacity is optional. If you do not define your desired capacity upfront, it defaults to your minimum capacity.
-
-Since a minimum capacity of 1 was defined, an instance was launched in only one AZ. This AZ went down, taking the application with it. If the minimum capacity is set to 2. As per Auto Scale AZ configuration, it would have launched 2 instances- one in each AZ, making the architecture disaster-proof and hence highly available.
-
- via - https://docs.aws.amazon.com/autoscaling/ec2/userguide/auto-scaling-benefits.html
-
-Incorrect options:
-
-Change the scaling metric of auto-scaling policy to network bytes - With target tracking scaling policies, you select a scaling metric and set a target value. You can use predefined customized metrics. Setting the metric to network bytes will not help in this context since the instances have to be spread across different AZs for high availability. The optimized way of doing it, is by defining minimum and maximum instance capacities, as discussed above.
-
-Configure ASG fast failover - This is a made-up option, given as a distractor.
-
-Enable RDS Multi-AZ - This configuration will make your database highly available. But for the current scenario, you will need to have more than 1 instance in separate availability zones to keep the application highly available.
+**❌ Неправильні варіанти:**
+- *Scaling metric = network bytes* — метрика масштабування не розподіляє інстанси по AZ. Для високої доступності потрібна правильна мінімальна кількість інстансів.
+- *ASG fast failover* — такої функції не існує.
+- *RDS Multi-AZ* — робить високодоступною базу даних, але не застосунок: для нього потрібно кілька інстансів у різних AZ.
 
 Джерела: <https://docs.aws.amazon.com/autoscaling/ec2/userguide/asg-capacity-limits.html> · <https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-maintain-instance-levels.html> · <https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html>
 
@@ -202,7 +157,7 @@ Enable RDS Multi-AZ - This configuration will make your database highly availabl
 
 <a id="t07-q08"></a>
 ### T07-Q08
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A developer from your team has configured the load balancer to route traffic equally between instances or across Availability Zones. However, Elastic Load Balancing (ELB) routes more traffic to one instance or Availability Zone than the others.
 
@@ -214,27 +169,25 @@ Why is this happening and how can it be fixed? (Select two)
 - ▫️ For Application Load Balancers, cross-zone load balancing is disabled by default
 - ✅ Sticky sessions are enabled for the load balancer
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Instances of a specific capacity type aren’t equally distributed across Availability Zones» + «Sticky sessions are enabled for the load balancer»**
 
-Sticky sessions are enabled for the load balancer - This can be the reason for potential unequal traffic routing by the load balancer. Sticky sessions are a mechanism to route requests to the same target in a target group. This is useful for servers that maintain state information in order to provide a continuous experience to clients. To use sticky sessions, the clients must support cookies.
+Обидві причини можуть пояснити нерівномірний розподіл трафіку.
 
-When a load balancer first receives a request from a client, it routes the request to a target, generates a cookie named AWSALB that encodes information about the selected target, encrypts the cookie, and includes the cookie in the response to the client. The client should include the cookie that it receives in subsequent requests to the load balancer. When the load balancer receives a request from a client that contains the cookie, if sticky sessions are enabled for the target group and the request goes to the same target group, the load balancer detects the cookie and routes the request to the same target.
+**Sticky sessions** спрямовують запити клієнта до того самого таргету, що корисно для серверів зі станом сесії. Клієнт має підтримувати cookies. Як це працює:
+1. На перший запит ALB вибирає таргет і створює зашифрований cookie `AWSALB` з інформацією про нього.
+2. Клієнт надсилає цей cookie в наступних запитах.
+3. ALB бачить cookie і спрямовує запит на той самий таргет.
 
-If you use duration-based session stickiness, configure an appropriate cookie expiration time for your specific use case. If you set session stickiness from individual applications, use session cookies instead of persistent cookies where possible.
+Для duration-based stickiness задайте розумний час життя cookie. Якщо stickiness керує застосунок, по можливості використовуйте session cookies, а не persistent.
 
-Instances of a specific capacity type aren’t equally distributed across Availability Zones - A Classic Load Balancer with HTTP or HTTPS listeners might route more traffic to higher-capacity instance types. This distribution aims to prevent lower-capacity instance types from having too many outstanding requests. It’s a best practice to use similar instance types and configurations to reduce the likelihood of capacity gaps and traffic imbalances.
+**Різна потужність інстансів.** Classic Load Balancer з HTTP/HTTPS може скеровувати більше трафіку на потужніші інстанси, щоб слабші не перевантажувалися. Найкраще використовувати однакові типи й конфігурації. Дисбаланс буває і тоді, коли інстанси однакової потужності працюють на різних AMI.
 
-A traffic imbalance might also occur if you have instances of similar capacities running on different Amazon Machine Images (AMIs). In this scenario, the imbalance of the traffic in favor of higher-capacity instance types is desirable.
-
-Incorrect options:
-
-There could be short-lived TCP connections between clients and instances - This is an incorrect statement. Long-lived TCP connections between clients and instances can potentially lead to unequal distribution of traffic by the load balancer. Long-lived TCP connections between clients and instances cause uneven traffic load distribution by design. As a result, new instances take longer to reach connection equilibrium. Be sure to check your metrics for long-lived TCP connections that might be causing routing issues in the load balancer.
-
-For Application Load Balancers, cross-zone load balancing is disabled by default - This is an incorrect statement. With Application Load Balancers, cross-zone load balancing is always enabled.
-
-After you disable an Availability Zone, the targets in that Availability Zone remain registered with the load balancer, thereby receiving random bursts of traffic - This is an incorrect statement. After you disable an Availability Zone, the targets in that Availability Zone remain registered with the load balancer. However, even though they remain registered, the load balancer does not route traffic to them.
+**❌ Неправильні варіанти:**
+- *Short-lived TCP connections* — дисбаланс спричиняють навпаки **довгоживучі** з'єднання: нові інстанси довше набирають навантаження.
+- *ALB cross-zone disabled by default* — для ALB cross-zone load balancing завжди увімкнено.
+- *Disabled AZ targets get random bursts* — таргети у вимкненій AZ лишаються зареєстрованими, але трафік на них не йде.
 
 Джерела: <https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html#sticky-sessions> · <https://aws.amazon.com/premiumsupport/knowledge-center/elb-fix-unequal-traffic-routing/> · <https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html#availability-zones>
 
@@ -244,7 +197,7 @@ After you disable an Availability Zone, the targets in that Availability Zone re
 
 <a id="t07-q14"></a>
 ### T07-Q14
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **Тут sticky sessions — ПРИЧИНА проблеми, а не найкраща архітектура.** → [детальніше](../../06-contradictions-and-traps.md#c01)
 
@@ -257,23 +210,22 @@ What could be the reason?
 - ✅ The Load Balancer does not have stickiness enabled
 - ▫️ Application Load Balancer is in slow-start mode, which gives ALB a little more time to read and write session data
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «The Load Balancer does not have stickiness enabled»**
 
-The Load Balancer does not have stickiness enabled - Sticky sessions are a mechanism to route requests to the same target in a target group. This is useful for servers that maintain state information to provide a continuous experience to clients. To use sticky sessions, the clients must support cookies.
+Sticky sessions спрямовують запити клієнта до того самого таргету. Це потрібно серверам, що зберігають стан сесії, і клієнт має підтримувати cookies. На перший запит ALB вибирає таргет, створює зашифрований cookie `AWSALB` і повертає його клієнту. У наступних запитах клієнт надсилає cookie, і ALB спрямовує їх на той самий таргет.
 
-When a load balancer first receives a request from a client, it routes the request to a target, generates a cookie named AWSALB that encodes information about the selected target, encrypts the cookie, and includes the cookie in the response to the client. The client should include the cookie that it receives in subsequent requests to the load balancer. When the load balancer receives a request from a client that contains the cookie, if sticky sessions are enabled for the target group and the request goes to the same target group, the load balancer detects the cookie and routes the request to the same target.
+Без stickiness кожен запит може потрапити на інший інстанс, де немає сесії, тож користувача «розлогінює».
 
-More info here:  via - https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html#sticky-sessions
+Детальніше: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html#sticky-sessions
 
-Incorrect options:
+ℹ️ Питають про **причину** проблеми. Як **найкращу архітектуру** обрали б винесення сесій у ElastiCache або DynamoDB. Див. 06.
 
-Application Load Balancer is in slow-start mode, which gives ALB a little more time to read and write session data - This is an invalid statement. The load balancer serves as a single point of contact for clients and distributes incoming traffic across its healthy registered targets. By default, a target starts to receive its full share of requests as soon as it is registered with a target group and passes an initial health check. Using slow start mode gives targets time to warm up before the load balancer sends them a full share of requests. This does not help in session management.
-
-The EC2 instances are logging out the users because the instances never have access to the client IPs because of the Load Balancer - This is an incorrect statement. Elastic Load Balancing stores the IP address of the client in the X-Forwarded-For request header and passes the header to the server. If needed, the server can read IP addresses from this data.
-
-The Load Balancer does not have TLS enabled - To use an HTTPS listener, you must deploy at least one SSL/TLS server certificate on your load balancer. The load balancer uses a server certificate to terminate the front-end connection and then decrypt requests from clients before sending them to the targets. This does not help in session management.
+**❌ Неправильні варіанти:**
+- *Slow-start mode* — дає новим таргетам час «прогрітися» перед повним навантаженням; сесіями не керує.
+- *Instances don't see client IPs* — IP клієнта передається в `X-Forwarded-For`, і причина не в цьому.
+- *TLS not enabled* — TLS шифрує з'єднання, а сесіями не керує.
 
 Джерела: <https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html#sticky-sessions> · <https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html#slow-start-mode>
 
@@ -283,7 +235,7 @@ The Load Balancer does not have TLS enabled - To use an HTTPS listener, you must
 
 <a id="t07-q22"></a>
 ### T07-Q22
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A telecommunications company that provides internet service for mobile device users maintains over 100 c4.large instances in the us-east-1 region. The EC2 instances run complex algorithms. The manager would like to track CPU utilization of the EC2 instances as frequently as every 10 seconds.
 
@@ -294,27 +246,16 @@ Which of the following represents the BEST solution for the given use-case?
 - ✅ Create a high-resolution custom metric and push the data using a script triggered every 10 seconds
 - ▫️ Open a support ticket with AWS
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Create a high-resolution custom metric and push the data using a script triggered every 10 seconds»**
 
-Create a high-resolution custom metric and push the data using a script triggered every 10 seconds
+High-resolution custom metrics публікуються з роздільністю 1 с, і їх видно через кілька секунд після публікації. High-resolution alarms оцінюють метрику з періодом 10 с, тож реагувати можна швидше. Доступні ті самі дії, що й для стандартних хвилинних alarms.
 
-Using high-resolution custom metric, your applications can publish metrics to CloudWatch with 1-second resolution. You can watch the metrics scroll across your screen seconds after they are published and you can set up high-resolution CloudWatch Alarms that evaluate as frequently as every 10 seconds. You can alert with High-Resolution Alarms, as frequently as 10-second periods. High-Resolution Alarms allow you to react and take actions faster and support the same actions available today with standard 1-minute alarms.
-
- via - https://aws.amazon.com/blogs/aws/new-high-resolution-custom-metrics-and-alarms-for-amazon-cloudwatch/
-
-Incorrect options:
-
-Enable EC2 detailed monitoring - As part of basic monitoring, Amazon EC2 sends metric data to CloudWatch in 5-minute periods. To send metric data for your instance to CloudWatch in 1-minute periods, you can enable detailed monitoring on the instance, however, this comes at an additional cost.
-
-Simply get it from the CloudWatch Metrics - You can get data from metrics. The basic monitoring data is available automatically in a 5-minute interval and detailed monitoring data is available in a 1-minute interval.
-
-Open a support ticket with AWS - This option has been added as a distractor.
-
-Reference:
-
-https://aws.amazon.com/blogs/aws/new-high-resolution-custom-metrics-and-alarms-for-amazon-cloudwatch/
+**❌ Неправильні варіанти:**
+- *EC2 detailed monitoring* — лише 1 хвилина замість 5 і за додаткову плату; цього недостатньо.
+- *Simply get it from CloudWatch Metrics* — стандартні метрики мають інтервал 5 хв (basic) або 1 хв (detailed).
+- *Support ticket* — до задачі не стосується.
 
 </details>
 
@@ -322,7 +263,7 @@ https://aws.amazon.com/blogs/aws/new-high-resolution-custom-metrics-and-alarms-f
 
 <a id="t09-q15"></a>
 ### T09-Q15
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You create an Auto Scaling group to work with an Application Load Balancer. The scaling group is configured with a minimum size value of 5, a maximum value of 20, and the desired capacity value of 10. One of the 10 EC2 instances has been reported as unhealthy.
 
@@ -333,21 +274,16 @@ Which of the following actions will take place?
 - ▫️ The ASG will keep the instance running and re-start the application
 - ✅ The ASG will terminate the EC2 Instance
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «The ASG will terminate the EC2 Instance»**
 
-The ASG will terminate the EC2 Instance
+Щоб підтримувати задану кількість інстансів, EC2 Auto Scaling періодично перевіряє їх здоров'я. Нездоровий інстанс він термінує однією scaling activity, а наступною запускає новий на заміну.
 
-To maintain the same number of instances, Amazon EC2 Auto Scaling performs a periodic health check on running instances within an Auto Scaling group. When it finds that an instance is unhealthy, it terminates that instance and launches a new one. Amazon EC2 Auto Scaling creates a new scaling activity for terminating the unhealthy instance and then terminates it. Later, another scaling activity launches a new instance to replace the terminated instance.
-
-Incorrect options:
-
-The ASG will detach the EC2 instance from the group, and leave it running - The goal of the auto-scaling group is to get rid of the bad instance and replace it
-
-The ASG will keep the instance running and re-start the application - The ASG does not have control of your application
-
-The ASG will format the root EBS drive on the EC2 instance and run the User Data again - This will not happen, the ASG cannot assume the format of your EBS drive, and User Data only runs once at instance first boot.
+**❌ Неправильні варіанти:**
+- *Detach and leave running* — мета ASG — замінити поганий інстанс.
+- *Keep running and restart the app* — ASG не керує вашим застосунком.
+- *Format the root EBS and run User Data again* — ASG такого не робить, а User Data виконується лише при першому запуску.
 
 Джерела: <https://aws.amazon.com/premiumsupport/knowledge-center/auto-scaling-terminate-instance> · <https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-maintain-instance-levels.html#replace-unhealthy-instance>
 
@@ -357,7 +293,7 @@ The ASG will format the root EBS drive on the EC2 instance and run the User Data
 
 <a id="t09-q33"></a>
 ### T09-Q33
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A company is using a Border Gateway Protocol (BGP) based AWS VPN connection to connect from its on-premises data center to Amazon EC2 instances in the company’s account. The development team can access an EC2 instance in subnet A but is unable to access an EC2 instance in subnet B in the same VPC.
 
@@ -368,37 +304,21 @@ Which logs can be used to verify whether the traffic is reaching subnet B?
 - ✅ VPC Flow Logs
 - ▫️ VPN logs
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «VPC Flow Logs»**
 
-VPC Flow Logs - VPC Flow Logs is a feature that enables you to capture information about the IP traffic going to and from network interfaces in your VPC. Flow log data can be published to Amazon CloudWatch Logs or Amazon S3. After you've created a flow log, you can retrieve and view its data in the chosen destination.
+VPC Flow Logs записують інформацію про IP-трафік мережевих інтерфейсів у VPC. Дані публікуються в CloudWatch Logs або S3. Flow log створюють для VPC, підмережі або окремого інтерфейсу; для VPC чи підмережі моніториться кожен інтерфейс у ній. Записи — це лог-події з полями, що описують потік трафіку.
 
-You can create a flow log for a VPC, a subnet, or a network interface. If you create a flow log for a subnet or VPC, each network interface in that subnet or VPC is monitored.
+Під час створення вказують:
+- ресурс;
+- тип трафіку: accepted, rejected або all;
+- куди публікувати.
 
-Flow log data for a monitored network interface is recorded as flow log records, which are log events consisting of fields that describe the traffic flow.
-
-To create a flow log, you specify:
-
-The resource for which to create the flow log
-
-The type of traffic to capture (accepted traffic, rejected traffic, or all traffic)
-
-The destinations to which you want to publish the flow log data
-
-Incorrect options:
-
-VPN logs
-
-Subnet logs
-
-BGP logs
-
-These three options are incorrect and have been added as distractors.
-
-Reference:
-
-https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html
+**❌ Неправильні варіанти:**
+- *VPN logs* — такої функції немає.
+- *Subnet logs* — такої функції немає.
+- *BGP logs* — такої функції немає.
 
 </details>
 
@@ -406,7 +326,7 @@ https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html
 
 <a id="t09-q37"></a>
 ### T09-Q37
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 While troubleshooting, a developer realized that the Amazon EC2 instance is unable to connect to the Internet using the Internet Gateway.
 
@@ -418,25 +338,17 @@ Which conditions should be met for Internet connectivity to be established? (Sel
 - ▫️ The subnet has been configured to be Public and has no access to the internet
 - ✅ The route table in the instance’s subnet should have a route to an Internet Gateway
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct options:
+**✅ Правильна відповідь: «The network ACLs associated with the subnet must have rules to allow inbound and outbound traffic» + «The route table in the instance’s subnet should have a route to an Internet Gateway»**
 
-The network ACLs associated with the subnet must have rules to allow inbound and outbound traffic - The network access control lists (ACLs) that are associated with the subnet must have rules to allow inbound and outbound traffic on port 80 (for HTTP traffic) and port 443 (for HTTPs traffic). This is a necessary condition for Internet Gateway connectivity
+- **NACL** підмережі має дозволяти вхідний і вихідний трафік на портах 80 (HTTP) і 443 (HTTPS). Без цього Internet Gateway не працюватиме.
+- **Route table** підмережі містить маршрути, що визначають, куди йде трафік. Для доступу в інтернет потрібен маршрут на Internet Gateway (`0.0.0.0/0 → igw-…`).
 
-The route table in the instance’s subnet should have a route to an Internet Gateway - A route table contains a set of rules, called routes, that are used to determine where network traffic from your subnet or gateway is directed. The route table in the instance’s subnet should have a route defined to the Internet Gateway.
-
-Incorrect options:
-
-The instance's subnet is not associated with any route table - This is an incorrect statement. A subnet is implicitly associated with the main route table if it is not explicitly associated with a particular route table. So, a subnet is always associated with some route table.
-
-The instance's subnet is associated with multiple route tables with conflicting configurations - This is an incorrect statement. A subnet can only be associated with one route table at a time.
-
-The subnet has been configured to be Public and has no access to internet - This is an incorrect statement. Public subnets have access to the internet via Internet Gateway.
-
-Reference:
-
-https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html
+**❌ Неправильні варіанти:**
+- *Subnet not associated with any route table* — підмережа без явної асоціації неявно використовує main route table, тож таблиця маршрутів у неї є завжди.
+- *Multiple route tables* — підмережа може мати лише одну route table одночасно.
+- *Public subnet without internet* — публічна підмережа за визначенням має доступ в інтернет через IGW.
 
 </details>
 
@@ -444,7 +356,7 @@ https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html
 
 <a id="t09-q47"></a>
 ### T09-Q47
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A Developer is configuring Amazon EC2 Auto Scaling group to scale dynamically.
 
@@ -455,27 +367,18 @@ Which metric below is NOT part of Target Tracking Scaling Policy?
 - ▫️ ASGAverageCPUUtilization
 - ✅ ApproximateNumberOfMessagesVisible
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «ApproximateNumberOfMessagesVisible»**
 
-ApproximateNumberOfMessagesVisible - This is a CloudWatch Amazon SQS queue metric. The number of messages in a queue might not change proportionally to the size of the Auto Scaling group that processes messages from the queue. Hence, this metric does not work for target tracking.
+Питання на пошук метрики, яка **не підходить** для target tracking. `ApproximateNumberOfMessagesVisible` — метрика черги SQS, і кількість повідомлень не змінюється пропорційно розміру ASG, яка їх обробляє. Тому для target tracking її напряму не використовують. ℹ️ Рекомендований підхід — метрика backlog per instance: повідомлення ÷ кількість інстансів.
 
-Incorrect options:
+Target tracking: ви вибираєте метрику й цільове значення, а ASG сама створює alarms і рахує коригування. Політика масштабує вгору, коли метрика вища за ціль.
 
-With target tracking scaling policies, you select a scaling metric and set a target value. Amazon EC2 Auto Scaling creates and manages the CloudWatch alarms that trigger the scaling policy and calculates the scaling adjustment based on the metric and the target value.
-
-It is important to note that a target tracking scaling policy assumes that it should scale out your Auto Scaling group when the specified metric is above the target value. You cannot use a target tracking scaling policy to scale out your Auto Scaling group when the specified metric is below the target value.
-
-ASGAverageCPUUtilization - This is a predefined metric for target tracking scaling policy. This represents the Average CPU utilization of the Auto Scaling group.
-
-ASGAverageNetworkOut - This is a predefined metric for target tracking scaling policy. This represents the Average number of bytes sent out on all network interfaces by the Auto Scaling group.
-
-ALBRequestCountPerTarget - This is a predefined metric for target tracking scaling policy. This represents the Number of requests completed per target in an Application Load Balancer target group.
-
-Reference:
-
-https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html
+**❌ Інші варіанти — це наперед визначені метрики target tracking:**
+- *ASGAverageCPUUtilization* — середнє завантаження CPU групи.
+- *ASGAverageNetworkOut* — середня кількість байтів, надісланих усіма мережевими інтерфейсами групи.
+- *ALBRequestCountPerTarget* — кількість запитів на ціль у target group ALB.
 
 </details>
 
@@ -483,7 +386,7 @@ https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking
 
 <a id="t09-q50"></a>
 ### T09-Q50
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A junior developer has been asked to configure access to an Amazon EC2 instance hosting a web application. The developer has configured a new security group to permit incoming HTTP traffic from 0.0.0.0/0 and retained any default outbound rules. A custom Network Access Control List (NACL) connected with the instance's subnet is configured to permit incoming HTTP traffic from 0.0.0.0/0 and retained any default outbound rules.
 
@@ -494,27 +397,23 @@ Which of the following solutions would you suggest if the EC2 instance needs to 
 - ▫️ The configuration is complete on the EC2 instance for accepting and responding to requests
 - ▫️ Outbound rules need to be configured both on the security group and on the NACL for sending responses to the Internet Gateway
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «An outbound rule must be added to the Network ACL (NACL) to allow the response to be sent to the client on the ephemeral port range»**
 
-An outbound rule must be added to the Network ACL (NACL) to allow the response to be sent to the client on the ephemeral port range
+- **Security groups — stateful**: якщо вхідний трафік дозволено, відповідь пропускається автоматично.
+- **NACL — stateless**: треба явно дозволити і вхід, і вихід. Кастомний NACL за замовчуванням блокує все.
 
-Security groups are stateful, so allowing inbound traffic to the necessary ports enables the connection. Network ACLs are stateless, so you must allow both inbound and outbound traffic. By default, each custom Network ACL denies all inbound and outbound traffic until you add rules.
+Щоб сервіс на інстансі працював, NACL має дозволяти:
+1. вхідний трафік на порт сервісу;
+2. вихідний трафік на ephemeral-порти (1024–65535).
 
-To enable the connection to a service running on an instance, the associated network ACL must allow both: 1. Inbound traffic on the port that the service is listening on 2. Outbound traffic to ephemeral ports
+Клієнт підключається з випадкового ephemeral-порту, і відповідь сервісу йде саме на нього, тож вихід на ці порти треба дозволити в NACL.
 
-When a client connects to a server, a random port from the ephemeral port range (1024-65535) becomes the client's source port.
-
-The designated ephemeral port becomes the destination port for return traffic from the service. Outbound traffic to the ephemeral port must be allowed in the network ACL.
-
-Incorrect options:
-
-The configuration is complete on the EC2 instance for accepting and responding to requests - As explained above, this is an incorrect statement.
-
-An outbound rule on the security group has to be configured, to allow the response to be sent to the client on the HTTP port - Security groups are stateful. Therefore you don't need a rule that allows responses to inbound traffic.
-
-Outbound rules need to be configured both on the security group and on the NACL for sending responses to the Internet Gateway\* - Security Groups are stateful. Hence, return traffic is automatically allowed, so there is no need to configure an outbound rule on the security group.
+**❌ Неправильні варіанти:**
+- *Configuration complete* — бракує вихідного правила в NACL.
+- *Outbound rule on the security group* — SG stateful, відповіді пропускаються автоматично.
+- *Outbound rules on both SG and NACL* — для SG вихідне правило для відповідей не потрібне.
 
 Джерела: <https://aws.amazon.com/premiumsupport/knowledge-center/resolve-connection-sg-acl-inbound/> · <https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html#nacl-ephemeral-ports>
 
@@ -524,7 +423,7 @@ Outbound rules need to be configured both on the security group and on the NACL 
 
 <a id="t09-q60"></a>
 ### T09-Q60
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A business hosts its website on Amazon EC2 instances and employs Auto Scaling to adjust its resources according to traffic spikes. However, users globally report slow loading times because static content hosted on the EC2 instances takes too long to load, even outside of busy periods.
 
@@ -536,27 +435,20 @@ What pair of actions should be taken to improve the latency of the website? (Sel
 - ✅ Set up an Amazon CloudFront distribution to cache the static content with Amazon S3 configured as the origin
 - ▫️ Upgrade the CPU and RAM available to the EC2 instances
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Transfer the application’s static content hosted on EC2 instances to Amazon S3» + «Set up an Amazon CloudFront distribution to cache the static content with Amazon S3 configured as the origin»**
 
-Set up an Amazon CloudFront distribution to cache the static content with Amazon S3 configured as the origin
+CloudFront пришвидшує доставку статичного й динамічного контенту (.html, .css, .js, зображення) через світову мережу edge-локацій: запит іде в найближчу локацію з найменшою затримкою. Рішення:
+1. Перенести статичний контент з EC2 у S3.
+2. Зробити S3 origin для CloudFront.
 
-Transfer the application’s static content hosted on EC2 instances to Amazon S3
+Origin зберігає оригінальну версію об'єктів: для HTTP це бакет S3 або HTTP-сервер.
 
-Amazon CloudFront is a web service that speeds up distribution of your static and dynamic web content, such as .html, .css, .js, and image files, to your users. CloudFront delivers your content through a worldwide network of data centers called edge locations. When a user requests content that you're serving with CloudFront, the request is routed to the edge location that provides the lowest latency (time delay), so that content is delivered with the best possible performance.
-
-For the given use case, you can transfer the static content from EC2 instances to Amazon S3. Then, you can specify the origin as the Amazon S3 bucket from which CloudFront gets your files which will then be distributed from CloudFront edge locations all over the world. An origin stores the original, definitive version of your objects. If you're serving content over HTTP, your origin is either an Amazon S3 bucket or an HTTP server, such as a web server.
-
- via - https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html
-
-Incorrect options:
-
-Upgrade the CPU and RAM available to the EC2 instances - Since the static content takes too long to load even outside of busy periods, this implies that the underlying root cause is the high end-to-end network latency rather than the hardware of the EC2 instance.
-
-Double the Auto Scaling group’s desired capacity - The desired capacity represents the initial capacity of the Auto Scaling group at the time of creation. An Auto Scaling group attempts to maintain the desired capacity. It starts by launching the number of instances that are specified for the desired capacity, and maintains this number of instances as long as there are no scaling policies or scheduled actions attached to the Auto Scaling group. Since the static content takes too long to load even outside of busy periods, so doubling the desired capacity would still not address the underlying root cause of high end-to-end network latency.
-
-Migrate the application to AWS Lambda - You cannot store static content on AWS Lambda, so this option just serves as a distractor.
+**❌ Неправильні варіанти:**
+- *Upgrade CPU/RAM* — контент повільний навіть поза піковими годинами, тож проблема в мережевій затримці, а не в залізі.
+- *Double desired capacity* — та сама причина: затримка мережева, кількість інстансів не допоможе.
+- *Migrate to Lambda* — Lambda не зберігає статичний контент.
 
 Джерела: <https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.SimpleDistribution.html> · <https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html>
 
@@ -566,7 +458,7 @@ Migrate the application to AWS Lambda - You cannot store static content on AWS L
 
 <a id="t11-q09"></a>
 ### T11-Q09
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 An organization has offices across multiple locations and the technology team has configured an Application Load Balancer across targets in multiple Availability Zones. The team wants to analyze the incoming requests for latencies and the client's IP address patterns.
 
@@ -577,27 +469,18 @@ Which feature of the Load Balancer will help collect the required information?
 - ▫️ ALB request tracing
 - ✅ ALB access logs
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «ALB access logs»**
 
-ALB access logs - Elastic Load Balancing provides access logs that capture detailed information about requests sent to your load balancer. Each log contains information such as the time the request was received, the client's IP address, latencies, request paths, and server responses. You can use these access logs to analyze traffic patterns and troubleshoot issues. Access logging is an optional feature of Elastic Load Balancing that is disabled by default.
+Access logs ELB містять детальну інформацію про кожен запит: час, IP клієнта, затримки, шлях, відповідь сервера. Ними аналізують трафік і шукають проблеми. За замовчуванням вимкнені.
 
-Access logs for your Application Load Balancer:  via - https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+Детальніше: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
 
-Incorrect options:
-
-CloudTrail logs - Elastic Load Balancing is integrated with AWS CloudTrail, a service that provides a record of actions taken by a user, role, or an AWS service in Elastic Load Balancing. CloudTrail captures all API calls for Elastic Load Balancing as events. You can use AWS CloudTrail to capture detailed information about the calls made to the Elastic Load Balancing API and store them as log files in Amazon S3. You can use these CloudTrail logs to determine which API calls were made, the source IP address where the API call came from, who made the call, when the call was made, and so on.
-
-CloudWatch metrics - Elastic Load Balancing publishes data points to Amazon CloudWatch for your load balancers and your targets. CloudWatch enables you to retrieve statistics about those data points as an ordered set of time-series data, known as metrics. You can use metrics to verify that your system is performing as expected. This is the right feature if you wish to track a certain metric.
-
-ALB request tracing - You can use request tracing to track HTTP requests. The load balancer adds a header with a trace identifier to each request it receives. Request tracing will not help you to analyze latency specific data.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-monitoring.html
-
-https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+**❌ Неправильні варіанти:**
+- *CloudTrail logs* — записують виклики API ELB: хто, коли, звідки. Самі запити до балансувальника там не фіксуються.
+- *CloudWatch metrics* — агреговані часові ряди, а не дані окремих запитів.
+- *ALB request tracing* — додає trace-заголовок до запитів, але затримки не аналізує.
 
 </details>
 
@@ -605,7 +488,7 @@ https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balance
 
 <a id="t11-q41"></a>
 ### T11-Q41
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A firm runs its technology operations on a fleet of Amazon EC2 instances. The firm needs a certain software to be available on the instances to support their daily workflows. The developer team has been told to use the user data feature of EC2 instances.
 
@@ -618,27 +501,18 @@ By default, scripts entered as user data do not have root user privileges for ex
 - ▫️ By default, user data is executed every time an EC2 instance is re-started
 - ✅ By default, user data runs only during the boot cycle when you first launch an instance
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct options:
+**✅ Правильна відповідь: «By default, scripts entered as user data are executed with root user privileges» + «By default, user data runs only during the boot cycle when you first launch an instance»**
 
-User Data is generally used to perform common automated configuration tasks and even run scripts after the instance starts. When you launch an instance in Amazon EC2, you can pass two types of user data - shell scripts and cloud-init directives. You can also pass this data into the launch wizard as plain text or as a file.
+User Data використовують для автоматичного налаштування і скриптів при старті інстансу. Передати можна shell-скрипти або директиви cloud-init, текстом чи файлом.
+- **Root-права.** Скрипти виконуються від root, тож `sudo` не потрібен. Створені файли належать root; для інших користувачів права змінюють у скрипті.
+- **Лише перший запуск.** За замовчуванням User Data виконується тільки при першому завантаженні. Можна налаштувати виконання при кожному перезапуску.
 
-By default, scripts entered as user data are executed with root user privileges - Scripts entered as user data are executed as the root user, hence do not need the sudo command in the script. Any files you create will be owned by root; if you need non-root users to have file access, you should modify the permissions accordingly in the script.
-
-By default, user data runs only during the boot cycle when you first launch an instance - By default, user data scripts and cloud-init directives run only during the boot cycle when you first launch an instance. You can update your configuration to ensure that your user data scripts and cloud-init directives run every time you restart your instance.
-
-Incorrect options:
-
-By default, user data is executed every time an EC2 instance is re-started - As discussed above, this is not a default configuration of the system. But, can be achieved by explicitly configuring the instance.
-
-When an instance is running, you can update user data by using root user credentials - You can't change the user data if the instance is running (even by using root user credentials), but you can view it.
-
-By default, scripts entered as user data do not have root user privileges for executing - Scripts entered as user data are executed as the root user, hence do not need the sudo command in the script.
-
-Reference:
-
-https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
+**❌ Неправильні варіанти:**
+- *Executed on every restart* — не за замовчуванням, лише якщо так налаштувати.
+- *Update user data while running* — на запущеному інстансі User Data можна переглянути, але не змінити; спочатку інстанс зупиняють.
+- *No root privileges* — виконується від root.
 
 </details>
 
@@ -646,7 +520,7 @@ https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
 
 <a id="t11-q65"></a>
 ### T11-Q65
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You have created an Elastic Load Balancer that has marked all the EC2 instances in the target group as unhealthy. Surprisingly, when you enter the IP address of the EC2 instances in your web browser, you can access your website.
 
@@ -658,25 +532,18 @@ What could be the reason your instances are being marked as unhealthy? (Select t
 - ▫️ You need to attach Elastic IP to the EC2 instances
 - ▫️ The EBS volumes have been improperly mounted
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct options
+**✅ Правильна відповідь: «The route for the health check is misconfigured» + «The security group of the EC2 instance does not allow for traffic from the security group of the Application Load Balancer»**
 
-The security group of the EC2 instance does not allow for traffic from the security group of the Application Load Balancer
+Балансувальник має зв'язуватися з таргетами і на порту listener, і на порту health check. Коли додаєте listener або змінюєте порт health check, перевірте, що security groups дозволяють трафік на цьому порту в обидва боки. Інакше або health check йде на неправильний шлях, або SG інстансу не пропускає трафік від SG ALB, і таргети стають нездоровими.
 
-The route for the health check is misconfigured
+Детальніше: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-update-security-groups.html
 
-You must ensure that your load balancer can communicate with registered targets on both the listener port and the health check port. Whenever you add a listener to your load balancer or update the health check port for a target group used by the load balancer to route requests, you must verify that the security groups associated with the load balancer allow traffic on the new port in both directions.
-
-Application Load Balancer Configuration for Security Groups and Health Check Routes:  via - https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-update-security-groups.html
-
-Incorrect options:
-
-The EBS volumes have been improperly mounted - You can access the website using the IP address which means there is no issue with the EBS volumes. So this option is not correct.
-
-Your web-app has a runtime that is not supported by the Application Load Balancer - There is no connection between a web app and the application load balancer. This option has been added as a distractor.
-
-You need to attach Elastic IP to the EC2 instances - This option is a distractor as Elastic IPs do not need to be assigned to EC2 instances while using an Application Load Balancer.
+**❌ Неправильні варіанти:**
+- *EBS improperly mounted* — сайт доступний за IP, тож диски в порядку.
+- *Unsupported runtime* — ALB не залежить від runtime застосунку.
+- *Attach Elastic IPs* — з ALB Elastic IP інстансам не потрібні.
 
 Джерела: <https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-update-security-groups.html>
 
@@ -686,7 +553,7 @@ You need to attach Elastic IP to the EC2 instances - This option is a distractor
 
 <a id="t12-q13"></a>
 ### T12-Q13
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A developer while working on Amazon EC2 instances, realized that an instance was not needed and had shut it down. But another instance of the same type automatically got launched in the account.
 
@@ -697,19 +564,16 @@ Which of the following options can attribute the given sequence of actions?
 - ✅ Instance might be part of Auto Scaling Group and hence re-launched similar instance
 - ▫️ The instance could have been a part of Network Load Balancer and hence was automatically started
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Instance might be part of Auto Scaling Group and hence re-launched similar instance»**
 
-Instance might be part of Auto Scaling Group and hence re-launched similar instance - Auto Scaling groups can be configured to launch an instance to replace an instance that is undergoing maintenance. This could have been the reason why an instance of the same type got launched automatically. The size of an Auto Scaling group depends on the number of instances that you set as the desired capacity. If you wish to terminate an instance that is part of Auto Scaling Group, the configuration of the group should be changed to a reduced number of instances, so the automatic launch of instances does not happen when an unwanted instance is terminated.
+ASG підтримує desired capacity: якщо інстанс термінувати, вона запустить такий самий на заміну. Щоб справді прибрати інстанс, зменшують desired capacity групи або термінують із прапорцем `--should-decrement-desired-capacity`.
 
-Incorrect options:
-
-The user did not have the right permissions to shutdown the instance. User needs root permissions to terminate an instance - This is an incorrect statement. If the user does not have enough permissions, then the action itself is unavailable for him. A user does not need root permissions to terminate an EC2 instance.
-
-The instance could have been a part of the Application Load Balancer and hence was automatically started - Application Load Balancer is used to balance the incoming traffic requests equally among the available EC2 instances so keep the performance and availability at its best. ALBs are configured with Auto Scaling Groups, but this is not specified in the use-case. In the absence of Auto Scaling Group, ALB cannot launch instances by itself.
-
-The instance could have been a part of Network Load Balancer and hence was automatically started - As explained above for ALB, a Network Load Balancer is not capable of launching instances by itself if it's not configured with an Auto Scaling Group.
+**❌ Неправильні варіанти:**
+- *Needs root permissions* — root для термінування не потрібен; без прав дія була б просто недоступна.
+- *Part of an ALB* — ALB сам інстанси не запускає.
+- *Part of an NLB* — NLB сам інстанси не запускає.
 
 Джерела: <https://docs.aws.amazon.com/autoscaling/ec2/userguide/AutoScalingGroup.html> · <https://docs.aws.amazon.com/autoscaling/ec2/userguide/detach-instance-asg.html>
 
@@ -719,7 +583,7 @@ The instance could have been a part of Network Load Balancer and hence was autom
 
 <a id="t12-q18"></a>
 ### T12-Q18
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A development team has noticed that one of the EC2 instances has been wrongly configured with the 'DeleteOnTermination' attribute set to True for its root EBS volume.
 
@@ -730,21 +594,16 @@ As a developer associate, can you suggest a way to disable this flag while the i
 - ▫️ Update the attribute using AWS management console. Select the EC2 instance and then uncheck the Delete On Termination check box for the root EBS volume
 - ▫️ Set the DisableApiTermination attribute of the instance using the API
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Set the DeleteOnTermination attribute to False using the command line»**
 
-When an instance terminates, the value of the DeleteOnTermination attribute for each attached EBS volume determines whether to preserve or delete the volume. By default, the DeleteOnTermination attribute is set to True for the root volume and is set to False for all other volume types.
+Коли інстанс термінують, атрибут `DeleteOnTermination` кожного підключеного тому EBS визначає, видалити його чи зберегти. За замовчуванням `True` для root-тому і `False` для інших томів. Для вже запущеного інстансу атрибут змінюють через CLI: `aws ec2 modify-instance-attribute --block-device-mappings ...`.
 
-Set the DeleteOnTermination attribute to False using the command line - If the instance is already running, you can set DeleteOnTermination to False using the command line.
-
-Incorrect options:
-
-Update the attribute using AWS management console. Select the EC2 instance and then uncheck the Delete On Termination check box for the root EBS volume - You can set the DeleteOnTermination attribute to False when you launch a new instance. It is not possible to update this attribute of a running instance from the AWS console.
-
-Set the DisableApiTermination attribute of the instance using the API - By default, you can terminate your instance using the Amazon EC2 console, command-line interface, or API. To prevent your instance from being accidentally terminated using Amazon EC2, you can enable termination protection for the instance. The DisableApiTermination attribute controls whether the instance can be terminated using the console, CLI, or API. This option cannot be used to control the delete status for the EBS volume when the instance terminates.
-
-The attribute cannot be updated when the instance is running. Stop the instance from Amazon EC2 console and then update the flag - This statement is wrong and given only as a distractor.
+**❌ Неправильні варіанти:**
+- *Uncheck in the Console for a running instance* — у консолі це задають лише під час запуску інстансу.
+- *DisableApiTermination* — захищає інстанс від термінування, а не том від видалення.
+- *Stop the instance first* — атрибут можна змінити й на запущеному інстансі.
 
 Джерела: <https://aws.amazon.com/premiumsupport/knowledge-center/deleteontermination-ebs/> · <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html#delete-on-termination-running-instance>
 
@@ -754,7 +613,7 @@ The attribute cannot be updated when the instance is running. Stop the instance 
 
 <a id="t12-q20"></a>
 ### T12-Q20
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A development team has inherited a web application running in the us-east-1 region with three availability zones (us-east-1a, us-east1-b, and us-east-1c) whose incoming web traffic is routed by a load balancer. When one of the EC2 instances hosting the web application crashes, the team realizes that the load balancer continues to route traffic to that instance causing intermittent issues.
 
@@ -765,27 +624,18 @@ Which of the following should the development team do to minimize this problem?
 - ▫️ Enable Multi AZ deployments
 - ✅ Enable Health Checks
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Enable Health Checks»**
 
-Enable Health Checks
+Балансувальник регулярно перевіряє доступність інстансів: пінгує, підключається або надсилає запити. Це health checks. Здорові інстанси мають статус `InService`, нездорові — `OutOfService`, і трафік на них не йде.
 
-To discover the availability of your EC2 instances, a load balancer periodically sends pings, attempts connections, or sends requests to test the EC2 instances. These tests are called health checks. The status of the instances that are healthy at the time of the health check is InService. The status of any instances that are unhealthy at the time of the health check is OutOfService.
+Детальніше: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html
 
-Load Balancer Health Checks:  via - https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html
-
-Incorrect options:
-
-Enable Stickiness - Stickiness enables the load balancer to bind a user's session to a specific instance, it cannot be used for gauging the health of an instance.
-
-Enable Multi-AZ deployments - It's a good practice to provision instances in more than one availability zone however you still need a way to check the health status of the instances, so this option is incorrect.
-
-Enable SSL - This option has been added as a distractor. SSL encrypts the transmission of data between a web server and a browser.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html
+**❌ Неправильні варіанти:**
+- *Stickiness* — прив'язує сесію до інстансу, а здоров'я не перевіряє.
+- *Multi-AZ* — корисно, але перевіряти здоров'я все одно треба.
+- *SSL* — шифрування трафіку, до здоров'я не стосується.
 
 </details>
 
@@ -793,7 +643,7 @@ https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group
 
 <a id="t12-q25"></a>
 ### T12-Q25
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 Your web application front end consists of 5 EC2 instances behind an Application Load Balancer. You have configured your web application to capture the IP address of the client making requests. When viewing the data captured you notice that every IP address being captured is the same, which also happens to be the IP address of the Application Load Balancer.
 
@@ -804,25 +654,16 @@ What should you do to identify the true IP address of the client?
 - ▫️ Look into the client's cookie
 - ▫️ Look into the X-Forwarded-Proto header in the backend
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Look into the X-Forwarded-For header in the backend»**
 
-Look into the X-Forwarded-For header in the backend
+Балансувальник стоїть між клієнтом і сервером, тож у логах сервера видно лише IP балансувальника. ELB записує IP клієнта в заголовок `X-Forwarded-For` і передає його серверу.
 
-The X-Forwarded-For request header helps you identify the IP address of a client when you use an HTTP or HTTPS load balancer. Because load balancers intercept traffic between clients and servers, your server access logs contain only the IP address of the load balancer. To see the IP address of the client, use the X-Forwarded-For request header. Elastic Load Balancing stores the IP address of the client in the X-Forwarded-For request header and passes the header to your server.
-
-Incorrect options:
-
-Modify the front-end of the website so that the users send their IP in the requests - When a user makes a request the IP address is sent with the request to the server and the load balancer intercepts it. There is no need to modify the application.
-
-Look into the X-Forwarded-Proto header in the backend - The X-Forwarded-Proto request header helps you identify the protocol (HTTP or HTTPS) that a client used to connect to your load balancer.
-
-Look into the client's cookie - For this, we would need to modify the client-side logic and server-side logic, which would not be efficient.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/x-forwarded-headers.html
+**❌ Неправильні варіанти:**
+- *Front-end sends IP* — змінювати застосунок не потрібно.
+- *X-Forwarded-Proto* — протокол (HTTP чи HTTPS), яким клієнт підключився.
+- *Client's cookie* — довелося б змінювати логіку клієнта й сервера.
 
 </details>
 
@@ -830,7 +671,7 @@ https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/x-forwarded-head
 
 <a id="t12-q26"></a>
 ### T12-Q26
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A development team has configured an Elastic Load Balancer for host-based routing. The idea is to support multiple subdomains and different top-level domains.
 
@@ -841,31 +682,21 @@ The rule \*.sample.com matches which of the following?
 - ✅ test.sample.com
 - ▫️ sample.com
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «test.sample.com»**
 
-test.sample.com - You can use host conditions to define rules that route requests based on the hostname in the host header (also known as host-based routing). This enables you to support multiple subdomains and different top-level domains using a single load balancer.
+Host conditions маршрутизують запити за іменем хоста в заголовку `Host` (host-based routing). Так один балансувальник обслуговує кілька субдоменів і доменів. Правила для hostname:
+- не чутливий до регістру, до 128 символів;
+- дозволені символи: `A–Z`, `a–z`, `0–9`, `-`, `.`, `*` (0 чи більше символів), `?` (рівно 1 символ);
+- щонайменше одна крапка, після останньої — лише літери.
 
-A hostname is not case-sensitive, can be up to 128 characters in length, and can contain any of the following characters: 1. A–Z, a–z, 0–9 2. - . 3. \* (matches 0 or more characters) 4. ? (matches exactly 1 character)
+`*.sample.com` збігається з `test.sample.com`, але не з `sample.com`.
 
-You must include at least one "." character. You can include only alphabetical characters after the final "." character.
-
-The rule \*.sample.com matches test.sample.com but doesn't match sample.com.
-
-Incorrect options:
-
-sample.com
-
-sample.test.com
-
-SAMPLE.COM
-
-These three options contradict the explanation provided above, so these options are incorrect.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html
+**❌ Неправильні варіанти:**
+- *sample.com* — немає субдомену перед `.sample.com`.
+- *sample.test.com* — інший домен.
+- *SAMPLE.COM* — регістр не важливий, але субдомену немає.
 
 </details>
 
@@ -873,7 +704,7 @@ https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balance
 
 <a id="t12-q31"></a>
 ### T12-Q31
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A developer has just completed configuring the Application Load Balancer for the EC2 instances. Just as he started testing his configuration, he realized that he has missed assigning target groups to his ALB.
 
@@ -884,23 +715,16 @@ Which error code should he expect in his debug logs?
 - ▫️ HTTP 403
 - ▫️ HTTP 504
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «HTTP 503»**
 
-HTTP 503 - HTTP 503 indicates 'Service unavailable' error. This error in ALB is an indicator of the target groups for the load balancer having no registered targets.
+HTTP 503 (Service Unavailable) на ALB означає, що в target group немає зареєстрованих таргетів.
 
-Incorrect options:
-
-HTTP 500 - HTTP 500 indicates 'Internal server' error. There are several reasons for their error: A client submitted a request without an HTTP protocol, and the load balancer was unable to generate a redirect URL, there was an error executing the web ACL rules.
-
-HTTP 504 - HTTP 504 is 'Gateway timeout' error. Several reasons for this error, to quote a few: The load balancer failed to establish a connection to the target before the connection timeout expired, The load balancer established a connection to the target but the target did not respond before the idle timeout period elapsed.
-
-HTTP 403 - HTTP 403 is 'Forbidden' error. You configured an AWS WAF web access control list (web ACL) to monitor requests to your Application Load Balancer and it blocked a request.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html
+**❌ Неправильні варіанти:**
+- *HTTP 500* — внутрішня помилка балансувальника, наприклад запит без HTTP-протоколу, неможливо сформувати redirect URL або помилка правил WAF.
+- *HTTP 504* — Gateway Timeout: не вдалося з'єднатися з таргетом або таргет не відповів за idle timeout.
+- *HTTP 403* — Forbidden: запит заблокував WAF.
 
 </details>
 
@@ -908,7 +732,7 @@ https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balance
 
 <a id="t12-q37"></a>
 ### T12-Q37
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A developer is configuring the redirect actions for an Application Load Balancer. The developer stumbled upon the following snippet of code.
 
@@ -972,86 +796,31 @@ Which of the following is an example of a query string condition that the develo
   ]
   ```
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
-
-**
-
+**✅ Правильна відповідь:**
+```json
 [
   {
       "Field": "query-string",
       "QueryStringConfig": {
           "Values": [
-            {
-                "Key": "version",
-                "Value": "v1"
-            },
-            {
-                "Value": "*example*"
-            }
+            { "Key": "version", "Value": "v1" },
+            { "Value": "*example*" }
           ]
       }
   }
 ]
-**
+```
 
-You can use query string conditions to configure rules that route requests based on key/value pairs or values in the query string. The match evaluation is not case-sensitive. The following wildcard characters are supported: * (matches 0 or more characters) and ? (matches exactly 1 character). You can specify conditions when you create or modify a rule.
+Умови `query-string` маршрутизують запити за парами ключ–значення або значеннями в query string. Порівняння не чутливе до регістру; підтримуються `*` (0 чи більше символів) і `?` (рівно 1 символ). Query string починається після першого `?` в URI, пари розділяються `&`, наприклад `?version=A&gender=female`.
 
-Query parameters are often used along with the path component of the URL for applying a special logic to the resource being fetched.
+Ця умова спрацьовує, якщо в query string є пара `version=v1` **або** будь-яке значення, що містить `example`.
 
-The query string component starts after the first "?" in a URI. Typically query strings contain key-value pairs separated by a delimiter "&". Example: http://example.com/path/to/page?version=A&gender=female
-
-The example condition given in the question is satisfied by requests with a query string that includes either a key/value pair of "version=v1" or any key set to "example".
-
-Incorrect options:
-
-**
-
-[
-  {
-      "Field": "query-string",
-      "PathPatternConfig": {
-          "Values": ["/img/*"]
-      }
-  }
-]
-**
-
-**
-
-[
-  {
-      "Field": "query-string",
-      "StringHeaderConfig": {
-          "Values": ["*.example.com"]
-      }
-  }
-]
-**
-
-These two options are malformed and are incorrect.
-
-**
-
-[
-  {
-      "Type": "redirect",
-      "RedirectConfig": {
-          "Protocol": "HTTPS",
-          "Port": "443",
-          "Host": "#{host}",
-          "Path": "/#{path}",
-          "Query": "#{query}",
-          "StatusCode": "HTTP_301"
-      }
-  }
-]
-** - This action redirects an HTTP request to an HTTPS request on port 443, with the same hostname, path, and query string as the HTTP request.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html#query-string-conditions
+**❌ Неправильні варіанти:**
+- *PathPatternConfig для query-string* — неправильна конфігурація.
+- *StringHeaderConfig* — неправильна конфігурація.
+- *RedirectConfig* — це дія redirect з HTTP на HTTPS (порт 443) зі збереженням хоста, шляху і query, а не умова.
 
 </details>
 
@@ -1059,7 +828,7 @@ https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balance
 
 <a id="t12-q50"></a>
 ### T12-Q50
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A company has configured an Auto Scaling group with health checks. The configuration is set to the desired capacity value of 3 and maximum capacity value of 3. The EC2 instances of your Auto Scaling group are configured to scale when CPU utilization is at 60 percent and is now running at 80 percent utilization.
 
@@ -1070,27 +839,18 @@ Which of the following will take place?
 - ▫️ System will trigger CloudWatch alarms to AWS support
 - ▫️ The desired capacity will go up to 4 and the maximum capacity will stay at 3
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «System will keep running as is»**
 
-System will keep running as is
+Група вже працює на максимальній ємності. Після створення ASG запускає інстанси до minimum, або до desired, якщо його вказано. Без інших правил масштабування вона й далі підтримує цю кількість. Desired не може перевищити maximum.
 
-You are already running at max capacity. After you have created your Auto Scaling group, the Auto Scaling group starts by launching enough EC2 instances to meet its minimum capacity (or its desired capacity, if specified). If there are no other scaling conditions attached to the Auto Scaling group, the Auto Scaling group maintains this number of running instances even if an instance becomes unhealthy.
+Детальніше: https://docs.aws.amazon.com/autoscaling/ec2/userguide/asg-capacity-limits.html
 
-Setting Capacity Limits for Your Auto Scaling Group:  via - https://docs.aws.amazon.com/autoscaling/ec2/userguide/asg-capacity-limits.html
-
-Incorrect options:
-
-The desired capacity will go up to 4 and the maximum capacity will stay at 3 - The desired capacity cannot go over the maximum capacity.
-
-The desired capacity will go up to 4 and the maximum capacity will also go up to 4 - The maximum capacity cannot change on its own just because the desired capacity has been set to a higher value. You will have to make those changes to the maximum capacity manually.
-
-System will trigger CloudWatch alarms to AWS support - This option has been added as a distractor. You already have alarms configured based on rules but AWS support will not intervene for you.
-
-Reference:
-
-https://docs.aws.amazon.com/autoscaling/ec2/userguide/asg-capacity-limits.html
+**❌ Неправильні варіанти:**
+- *Desired 4, max 3* — desired не може бути більшим за maximum.
+- *Desired 4, max 4* — maximum сам не зміниться; його змінюють вручну.
+- *Alarms to AWS Support* — AWS Support не втручається; варіант лише для відволікання.
 
 </details>
 
@@ -1098,7 +858,7 @@ https://docs.aws.amazon.com/autoscaling/ec2/userguide/asg-capacity-limits.html
 
 <a id="t12-q62"></a>
 ### T12-Q62
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A startup manages its Cloud resources with Elastic Beanstalk. The environment consists of few Amazon EC2 instances, an Auto Scaling Group (ASG), and an Elastic Load Balancer. Even after the Load Balancer marked an EC2 instance as unhealthy, the ASG has not replaced it with a healthy instance.
 
@@ -1109,19 +869,16 @@ As a Developer, suggest the necessary configurations to automate the replacement
 - ▫️ Auto Scaling group doesn't automatically replace the unhealthy instances marked by the load balancer. They have to be manually replaced from AWS Console
 - ▫️ Health check parameters were configured for checking the instance health alone. The instance failed because of application failure which was not configured as a parameter for health check status
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «The health check type of your instance's Auto Scaling group, must be changed from EC2 to ELB by using a configuration file»**
 
-The health check type of your instance's Auto Scaling group, must be changed from EC2 to ELB by using a configuration file - By default, the health check configuration of your Auto Scaling group is set as an EC2 type that performs a status check of EC2 instances. To automate the replacement of unhealthy EC2 instances, you must change the health check type of your instance's Auto Scaling group from EC2 to ELB by using a configuration file.
+За замовчуванням ASG використовує health check типу **EC2**, тобто лише status checks самого інстансу. Якщо впав застосунок, а інстанс живий, ASG вважає його здоровим і не замінює. Щоб нездорові за ELB інстанси замінювалися автоматично, тип health check змінюють з EC2 на **ELB**. В Elastic Beanstalk це роблять конфігураційним файлом у `.ebextensions`, параметр `HealthCheckType: ELB`.
 
-Incorrect options:
-
-Health check parameters were configured for checking the instance health alone. The instance failed because of application failure which was not configured as a parameter for health check status - This is an incorrect statement. Status checks, by definition, cover only an EC2 instance's health, and not the health of your application, server, or any Docker containers running on the instance.
-
-Auto Scaling group doesn't automatically replace the unhealthy instances marked by the load balancer. They have to be manually replaced from AWS Console - Incorrect statement. As discussed above, if the health check type of ASG is changed from EC2 to ELB, Auto Scaling will be able to replace the unhealthy instance.
-
-The ping path field of the Load Balancer is configured incorrectly - Ping path is a health check configuration field of Elastic Load Balancer. If the ping path is configured wrong, ELB will not be able to reach the instance and hence will consider the instance unhealthy. However, this would then apply to all instances, not just once instance. So it does not address the issue given in the use-case.
+**❌ Неправильні варіанти:**
+- *Parameters configured for instance health alone* — status checks за визначенням перевіряють лише інстанс, а не застосунок чи контейнери; параметрами health check це не налаштувати.
+- *ASG never replaces ELB-unhealthy instances* — замінює, якщо тип health check — ELB.
+- *Ping path misconfigured* — тоді нездоровими були б усі інстанси, а не один.
 
 Джерела: <https://aws.amazon.com/premiumsupport/knowledge-center/elastic-beanstalk-instance-automation/> · <https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-healthchecks.html>
 

@@ -93,9 +93,3 @@
 - [Amazon Cognito](4-troubleshooting/cognito.md) — 1
 - [KMS / шифрування / сертифікати](4-troubleshooting/kms.md) — 1
 - [Secrets Manager / Parameter Store](4-troubleshooting/secrets.md) — 1
-
-## Статистика твоїх спроб
-
-- ✅ правильно: 66
-- ❌ неправильно: 59 → [список помилок](my-mistakes.md)
-- ⏭ пропущено: 655

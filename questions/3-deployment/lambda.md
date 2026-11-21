@@ -3,11 +3,11 @@
 **Домен 3 — Розгортання** · питань: 10  
 Теорія: [01-domain1-development.md](../../01-domain1-development.md#lambda) · [Протиріччя](../../06-contradictions-and-traps.md) · [Застарілі/сумнівні відповіді](../../07-outdated-and-wrong-answers.md) · [Усі розділи](../README.md)
 
-> Тексти питань і пояснення — оригінальні англійською (на екзамені теж англійська). ✅ — правильна відповідь за ключем банку, ❌ — твоя минула помилкова відповідь. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
+> Тексти питань і варіантів — англійською (як на екзамені), пояснення — українською. ✅ — правильна відповідь за ключем банку. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
 
 <a id="t01-q21"></a>
 ### T01-Q21
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **API Gateway canary.** → [детальніше](../../06-contradictions-and-traps.md#c13)
 
@@ -20,27 +20,16 @@ Which of the following features will accomplish this task?
 - ▫️ Stage Variables
 - ▫️ Mapping Templates
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Canary Deployment»**
 
-Canary Deployment
+При canary release весь трафік API випадково ділиться в заданій пропорції між production release і canary release. Зазвичай canary отримує невеликий відсоток трафіку, решта йде на production. Оновлені функції API бачить лише трафік, що потрапляє на canary. Відсоток можна змінювати, балансуючи між покриттям тестами і продуктивністю.
 
-In a canary release deployment, total API traffic is separated at random into a production release and a canary release with a preconfigured ratio. Typically, the canary release receives a small percentage of API traffic and the production release takes up the rest. The updated API features are only visible to API traffic through the canary. You can adjust the canary traffic percentage to optimize test coverage or performance.
-
- via - https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html
-
-Incorrect options:
-
-Stage Variables - They act like environment variables and can be used in your API setup.
-
-Mapping Templates - Its a script to map the payload from a method request to the corresponding integration request and also maps the integration response to the corresponding method response.
-
-Custom Authorizers - Used for authentication purposes and must return AWS Identity and Access Management (IAM) policies.
-
-Reference:
-
-https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html
+**❌ Неправильні варіанти:**
+- *Stage Variables* — працюють як змінні середовища в налаштуваннях API.
+- *Mapping Templates* — скрипти, що перетворюють payload між method request і integration request (і назад для відповіді).
+- *Custom Authorizers* — для автентифікації; повертають IAM-політики.
 
 </details>
 
@@ -48,7 +37,7 @@ https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html
 
 <a id="t02-q45"></a>
 ### T02-Q45
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Management & Governance)*
+*домен: визначено автоматично (у джерелі: AWS Management & Governance)*
 
 > ⚠️ **"CloudWatch Events" = EventBridge.** → [детальніше](../../06-contradictions-and-traps.md#c14)
 
@@ -57,25 +46,19 @@ A company has implemented AWS CodePipeline to automate its release pipelines. Th
 Which steps must be taken to associate the Lambda function with the event source?
 
 - ▫️ Create an Amazon CloudWatch alarm that monitors status changes in CodePipeline and triggers the Lambda function
-- ❌ Create an event trigger and specify the Lambda function from the CodePipeline console
+- ▫️ Create an event trigger and specify the Lambda function from the CodePipeline console
 - ▫️ Create a trigger that invokes the Lambda function from the Lambda console by selecting CodePipeline as the event source
 - ✅ Create an Amazon CloudWatch Events rule that uses CodePipeline as an event source
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Amazon CloudWatch Events help you to respond to state changes in your AWS resources. When your resources change state, they automatically send events into an event stream. You can create rules that match selected events in the stream and route them to your AWS Lambda function to take action.
+**✅ Правильна відповідь: «Create an Amazon CloudWatch Events rule that uses CodePipeline as an event source»**
 
-AWS CodePipeline can be configured as an event source in CloudWatch Events and can then send notifications using as service such as Amazon SNS.
+CloudWatch Events (тепер EventBridge) реагують на зміни стану ресурсів AWS: ресурси автоматично надсилають події в потік, а правила вибирають потрібні й направляють, наприклад, у Lambda. CodePipeline може бути джерелом подій, а сповіщення надсилаються, наприклад, через SNS.
 
-Therefore, the best answer is to create an Amazon CloudWatch Events rule that uses CodePipeline as an event source.
-
-CORRECT: "Create an Amazon CloudWatch Events rule that uses CodePipeline as an event source" is the correct answer.
-
-INCORRECT: "Create a trigger that invokes the Lambda function from the Lambda console by selecting CodePipeline as the event source" is incorrect as CodePipeline cannot be configured as a trigger for Lambda.
-
-INCORRECT: "Create an event trigger and specify the Lambda function from the CodePipeline console" is incorrect as CodePipeline cannot be configured as a trigger for Lambda.
-
-INCORRECT: "Create an Amazon CloudWatch alarm that monitors status changes in CodePipeline and triggers the Lambda function" is incorrect as CloudWatch Events is used for monitoring state changes.
+**❌ Неправильні варіанти:**
+- *Trigger from the Lambda console with CodePipeline as the event source* і *Event trigger from the CodePipeline console* — CodePipeline не налаштовується як тригер Lambda.
+- *CloudWatch alarm that monitors status changes* — для змін стану використовують CloudWatch Events, а не alarms.
 
 Джерела: <https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html>
 
@@ -85,7 +68,7 @@ INCORRECT: "Create an Amazon CloudWatch alarm that monitors status changes in Co
 
 <a id="t03-q13"></a>
 ### T03-Q13
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A developer wants a seamless ability to return to older versions of a Lambda function that is being deployed.
 
@@ -96,25 +79,18 @@ Which of the following solutions offers the LEAST operational overhead?
 - ▫️ Use a Route 53 weighted policy that can point to the different Lambda function versions
 - ▫️ Use CodeDeploy to configure blue/green deployments for the different Lambda function versions
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Use a Lambda function alias that can point to the different versions»**
 
-Use a Lambda function alias that can point to the different versions
+Версії допомагають керувати деплоєм функцій: наприклад, можна опублікувати нову версію для бета-тестування, не зачіпаючи стабільну продакшн-версію. Кожна публікація створює нову незмінну версію — копію неопублікованого коду й конфігурації.
 
-You can use versions to manage the deployment of your functions. For example, you can publish a new version of a function for beta testing without affecting users of the stable production version. Lambda creates a new version of your function each time that you publish the function. The new version is a copy of the unpublished version of the function.
+Alias — вказівник на конкретну версію з власним унікальним ARN. Alias може вказувати лише на версію, а не на інший alias. Щоб повернутися до старої версії, достатньо перенаправити alias.
 
-By publishing a version of your function, you can store your code and configuration as a separate resource that cannot be changed.
-
-A Lambda alias is like a pointer to a specific function version. Users can access the function version using the alias Amazon Resource Name (ARN). Each alias has a unique ARN. An alias can point only to a function version, not to another alias. You can update an alias to point to the different versions of the Lambda function.
-
-Incorrect options:
-
-Use a Route 53 weighted policy that can point to the different Lambda function versions - This option is a distractor, as Route 53 cannot be used for the given use case. Route 53 weighted policy lets you associate multiple resources with a single domain name (example.com) or subdomain name (acme.example.com) and choose how much traffic is routed to each resource. This can be useful for a variety of purposes, including load balancing and testing new versions of software.
-
-Use CodeDeploy to configure blue/green deployments for the different Lambda function versions - A deployment to the AWS Lambda compute platform is always a blue/green deployment. You do not specify a deployment type option. When you deploy to an AWS Lambda compute platform, the deployment configuration specifies the way traffic is shifted to the new Lambda function versions in your application. You can shift traffic using a canary, linear, or all-at-once deployment configuration. Once deployed, you cannot go back to the previous versions of your Lambda function. So this option is incorrect.
-
-Use Lambda function layers that can point to the different versions - Lambda layers provide a convenient way to package libraries and other dependencies that you can use with your Lambda functions. Using layers reduces the size of uploaded deployment archives and makes it faster to deploy your code. You cannot use the Lambda function layers to point to the different versions of the Lambda function.
+**❌ Неправильні варіанти:**
+- *Route 53 weighted policy pointing to Lambda versions* — дистрактор: weighted policy розподіляє трафік домену між ресурсами, але для версій Lambda не підходить.
+- *CodeDeploy blue/green for Lambda versions* — деплой на Lambda і так завжди blue/green (canary/linear/all-at-once), але банк вважає, що повернення до старої версії тут не найпростіше; найменше накладних витрат дає alias.
+- *Lambda layers pointing to versions* — layers пакують бібліотеки й залежності, на версії функції вони не вказують.
 
 Джерела: <https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html> · <https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html> · <https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html#deployment-configuration-lambda> · <https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html>
 
@@ -124,7 +100,7 @@ Use Lambda function layers that can point to the different versions - Lambda lay
 
 <a id="t04-q11"></a>
 ### T04-Q11
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Developer Tools)*
+*домен: визначено автоматично (у джерелі: AWS Developer Tools)*
 
 A serverless application composed of multiple Lambda functions has been deployed. A developer is setting up AWS CodeDeploy to manage the deployment of code updates. The developer would like a 10% of the traffic to be shifted to the new version in equal increments, 10 minutes apart.
 
@@ -135,23 +111,16 @@ Which setting should be chosen for configuring how traffic is shifted?
 - ▫️ Canary
 - ✅ Linear
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-A deployment configuration is a set of rules and success and failure conditions used by CodeDeploy during a deployment. These rules and conditions are different, depending on whether you deploy to an EC2/On-Premises compute platform or an AWS Lambda compute platform.
+**✅ Правильна відповідь: «Linear»**
 
-The following table lists the predefined configurations available for AWS Lambda deployments.
+Deployment configuration — набір правил і умов успіху чи невдачі деплою CodeDeploy. Для Lambda є попередньо визначені конфігурації: canary (дві порції), linear (рівні порції через рівні інтервали), all-at-once. «10% трафіку рівними частками кожні 10 хвилин» — це linear: `CodeDeployDefault.LambdaLinear10PercentEvery10Minutes`.
 
-As you can see from the table above, the linear option shifts a specific amount of traffic in equal increments of time. Therefore, the following option should be chosen:
-
-CodeDeployDefault.LambdaLinear10PercentEvery10Minutes
-
-CORRECT: "Linear" is the correct answer.
-
-INCORRECT: "Canary" is incorrect as it does not shift traffic in equal increments.
-
-INCORRECT: "All-at-once" is incorrect as it shifts all traffic at once.
-
-INCORRECT: "Blue/green" is incorrect as it is a type of deployment, not a setting for traffic shifting.
+**❌ Неправильні варіанти:**
+- *Canary* — дві порції (наприклад, 10%, потім 90%), а не рівні частки.
+- *All-at-once* — весь трафік одразу.
+- *Blue/green* — тип деплою, а не налаштування перемикання трафіку.
 
 Джерела: <https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html>
 
@@ -161,7 +130,7 @@ INCORRECT: "Blue/green" is incorrect as it is a type of deployment, not a settin
 
 <a id="t04-q52"></a>
 ### T04-Q52
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **Lambda alias 10%.** → [детальніше](../../06-contradictions-and-traps.md#c13)
 
@@ -174,21 +143,16 @@ How can the Developer achieve this with MINIMAL impact on users?
 - ▫️ Change the application to use an alias that points to the current version. Deploy the new version of the code. Update the alias to use the newly deployed version. If too many errors are encountered, point the alias back to the previous version
 - ▫️ Change the application to use a version ARN that points to the latest published version. Deploy the new version of the code. Update the application to point to the ARN of the new version of the code. If too many errors are encountered, point the application back to the ARN of the previous version
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-You can create one or more aliases for your AWS Lambda function. A Lambda alias is like a pointer to a specific Lambda function version. Users can access the function version using the alias ARN.
+**✅ Правильна відповідь: «Change the application to use an alias that points to the current version. Deploy the new version of the code. Update the alias to direct 10% of users to the newly deployed version. If too many errors are encountered, send 100% of traffic to the previous version»**
 
-You can update the versions that an alias points to and you can also add multiple versions and use weightings to direct a percentage of traffic to a new version of the code.
+Alias Lambda — вказівник на конкретну версію; застосунок викликає функцію за ARN alias. Alias можна перенаправити на іншу версію або вказати дві версії з вагами, щоб частина трафіку йшла на нову. 10% на нову версію — мінімальний вплив на користувачів, а rollback простий: змінити вказівник alias.
 
-For this example the best choice is to use an alias and direct 10% of traffic to the new version. If errors are encountered the rollback is easy (change the pointer in the alias) and a minimum of impact has been made to users.
-
-CORRECT: "Change the application to use an alias that points to the current version. Deploy the new version of the code. Update the alias to direct 10% of users to the newly deployed version. If too many errors are encountered, send 100% of traffic to the previous version" is the correct answer.
-
-INCORRECT: "Change the application to use an alias that points to the current version. Deploy the new version of the code. Update the alias to use the newly deployed version. If too many errors are encountered, point the alias back to the previous version" is incorrect. This is not the best answer as 100% of the users will be directed to the new version so if any errors do occur more users will be affected.
-
-INCORRECT: "Change the application to use a version ARN that points to the latest published version. Deploy the new version of the code. Update the application to point to the ARN of the new version of the code. If too many errors are encountered, point the application back to the ARN of the previous version" is incorrect. This answer involves a lot of updates to the application that could be completely avoided by using an alias.
-
-INCORRECT: "Change the application to use the $LATEST version. Update and save code. If too many errors are encountered, modify and save the code" is incorrect as this is against best practice. The $LATEST is the unpublished version of the code where you make changes. You should publish to a version when the code is ready for deployment.
+**❌ Неправильні варіанти:**
+- *Update the alias to use the new version (100%), roll back if errors* — усі користувачі одразу потраплять на нову версію; при помилках постраждає більше людей.
+- *Use a version ARN in the application* — при кожному деплої доведеться змінювати застосунок; alias цього уникає.
+- *Use $LATEST and modify code on errors* — суперечить best practice: `$LATEST` — неопублікована версія для змін; для деплою публікують версію.
 
 Джерела: <https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html>
 
@@ -198,7 +162,7 @@ INCORRECT: "Change the application to use the $LATEST version. Update and save c
 
 <a id="t06-q03"></a>
 ### T06-Q03
-*✅ відповів правильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **Aliases + versions.** → [детальніше](../../06-contradictions-and-traps.md#c13)
 
@@ -211,25 +175,16 @@ What solution would allow the developer to update the Lambda code without needin
 - ✅ Create aliases and versions in AWS Lambda.
 - ▫️ Create multiple stages and deployments.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-You can create one or more aliases for your Lambda function. A Lambda alias is like a pointer to a specific function version. Users can access the function version using the alias Amazon Resource Name (ARN). You can then release new versions of your code without needing to change the alias that applications use to invoke the function.
+**✅ Правильна відповідь: «Create aliases and versions in AWS Lambda.»**
 
-In this case the REST API could be configured with aliases for the functions. The developer could also use different stages with different endpoints using the aliases. This would enable calling different versions of the application by changing the stage name in the REST API URL.
+Alias Lambda — це вказівник на конкретну версію функції, і до версії звертаються за ARN alias. Нові версії можна випускати, не змінюючи alias, який викликають застосунки. REST API налаштовують на aliases. Можна також зробити різні stages з різними endpoints, що використовують різні aliases: тоді іншу версію застосунку викликають, змінивши ім'я stage в URL.
 
-CORRECT: "Create aliases and versions in AWS Lambda" is the correct answer (as explained above.)
-
-INCORRECT: "Create multiple stages and deployments" is incorrect.
-
-Stages and stage variables could be used to reference different functions or aliases. But if only stages and deployments are used (and not a Lambda alias) then the REST API would need to have the endpoint updated every time a new function version is released.
-
-INCORRECT: "Create different tags for each Lambda function" is incorrect.
-
-Tags cannot be used to define the Lambda endpoints in the REST API.
-
-INCORRECT: "Create multiple private API endpoints and use CNAMEs" is incorrect.
-
-There is no value here in creating multiple private API endpoints as that would be completely different APIs.
+**❌ Неправильні варіанти:**
+- *Multiple stages and deployments* — stages і stage variables можуть посилатися на функції чи aliases. Але без aliases endpoint у REST API довелося б оновлювати з кожною новою версією.
+- *Tags* — тегами не визначити Lambda-endpoints у REST API.
+- *Multiple private API endpoints + CNAMEs* — це були б зовсім різні API; сенсу немає.
 
 Джерела: <https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html>
 
@@ -239,7 +194,7 @@ There is no value here in creating multiple private API endpoints as that would 
 
 <a id="t08-q13"></a>
 ### T08-Q13
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **Lambda alias + traffic shifting.** → [детальніше](../../06-contradictions-and-traps.md#c13)
 
@@ -252,21 +207,16 @@ What is the BEST way the Developer can implement the migration to the new versio
 - ✅ Create an Alias, assign the current and new versions and use traffic shifting to assign a percentage of traffic to the new version
 - ▫️ Create an Amazon Route 53 weighted routing policy pointing to the current and new versions, assign a lower weight to the new version
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-You can create one or more aliases for your AWS Lambda function. A Lambda alias is like a pointer to a specific Lambda function version. Users can access the function version using the alias ARN.
+**✅ Правильна відповідь: «Create an Alias, assign the current and new versions and use traffic shifting to assign a percentage of traffic to the new version»**
 
-Each alias has a unique ARN. An alias can only point to a function version, not to another alias. You can update an alias to point to a new version of the function. You can also use traffic shifting to direct a percentage of traffic to a specific version as showing in the image below:
+Alias Lambda — вказівник на версію функції з власним унікальним ARN. Він вказує лише на версію, не на інший alias, і його можна перенаправити на нову версію. Traffic shifting (weighted alias) направляє заданий відсоток трафіку на нову версію. Це рекомендований спосіб тестувати оновлення на частині трафіку.
 
-This is the recommended way to direct traffic to multiple function versions and shift traffic when testing code updated. Therefore, the best answer is to create an Alias, assign the current and new versions and use traffic shifting to assign a percentage of traffic to the new version.
-
-CORRECT: "Create an Alias, assign the current and new versions and use traffic shifting to assign a percentage of traffic to the new version" is the correct answer.
-
-INCORRECT: "Create an Amazon Route 53 weighted routing policy pointing to the current and new versions, assign a lower weight to the new version" is incorrect. AWS Lambda endpoints are not DNS names that you can route to with Route 53. The best way to route traffic to multiple versions is using an alias.
-
-INCORRECT: "Use an immutable update with a new ASG to deploy the new version in parallel, following testing cutover to the new version" is incorrect as immutable updates are associated with Amazon Elastic Beanstalk and this service does not deploy updates to AWS Lambda.
-
-INCORRECT: "Use an Amazon Elastic Load Balancer to direct a percentage of traffic to each target group containing the Lambda function versions" is incorrect as this introduces an unnecessary layer (complexity and cost) to the architecture. The best choice is to use an alias instead.
+**❌ Неправильні варіанти:**
+- *Route 53 weighted routing* — endpoints Lambda не є DNS-іменами, які можна маршрутизувати через Route 53.
+- *Immutable update with ASG* — це політика Elastic Beanstalk, яка не деплоїть Lambda.
+- *ELB with target groups per version* — зайвий шар, складність і вартість; alias простіший.
 
 Джерела: <https://docs.amazonaws.cn/en_us/lambda/latest/dg/configuration-aliases.html> · <https://docs.aws.amazon.com/lambda/latest/dg/aliases-intro.html> · <https://docs.aws.amazon.com/lambda/latest/dg/lambda-traffic-shifting-using-aliases.html>
 
@@ -276,7 +226,7 @@ INCORRECT: "Use an Amazon Elastic Load Balancer to direct a percentage of traffi
 
 <a id="t08-q65"></a>
 ### T08-Q65
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Developer Tools)*
+*домен: визначено автоматично (у джерелі: AWS Developer Tools)*
 
 A Developer is deploying an update to a serverless application that includes AWS Lambda using the AWS Serverless Application Model (SAM). The traffic needs to move from the old Lambda version to the new Lambda version gradually, within the shortest period of time.
 
@@ -287,35 +237,27 @@ Which deployment configuration is MOST suitable for these requirements?
 - ✅ CodeDeployDefault.LambdaCanary10Percent5Minutes
 - ▫️ CodeDeployDefault.LambdaLinear10PercentEvery1Minute
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-If you use AWS SAM to create your serverless application, it comes built-in with CodeDeploy to provide gradual Lambda deployments. With just a few lines of configuration, AWS SAM does the following for you:
+**✅ Правильна відповідь: «CodeDeployDefault.LambdaCanary10Percent5Minutes»**
 
-• Deploys new versions of your Lambda function, and automatically creates aliases that point to the new version.
+SAM має вбудовану інтеграцію з CodeDeploy для поступових деплоїв Lambda. Кількома рядками конфігурації SAM:
+- деплоїть нові версії й автоматично створює alias на нову версію;
+- поступово переводить трафік і дозволяє відкотитися;
+- запускає pre-traffic і post-traffic hooks для перевірки;
+- відкочує деплой, якщо спрацювали CloudWatch alarms.
 
-• Gradually shifts customer traffic to the new version until you're satisfied that it's working as expected, or you roll back the update.
+Способи перемикання трафіку:
+- **Canary** — дві порції: заданий відсоток, а через N хвилин решта;
+- **Linear** — рівні порції через рівні інтервали;
+- **All-at-once** — увесь трафік одразу.
 
-• Defines pre-traffic and post-traffic test functions to verify that the newly deployed code is configured correctly and your application operates as expected.
+`LambdaCanary10Percent5Minutes` дає 10%, а через 5 хвилин решту. Весь деплой займає 5 хвилин.
 
-• Rolls back the deployment if CloudWatch alarms are triggered.
-
-There are several options for how CodeDeploy shifts traffic to the new Lambda version. You can choose from the following:
-
-• Canary: Traffic is shifted in two increments. You can choose from predefined canary options. The options specify the percentage of traffic that's shifted to your updated Lambda function version in the first increment, and the interval, in minutes, before the remaining traffic is shifted in the second increment.
-
-• Linear: Traffic is shifted in equal increments with an equal number of minutes between each increment. You can choose from predefined linear options that specify the percentage of traffic that's shifted in each increment and the number of minutes between each increment.
-
-All-at-once: All traffic is shifted from the original Lambda function to the updated Lambda function version at once.
-
-Therefore CodeDeployDefault.LambdaCanary10Percent5Minutes is the best answer as this will shift 10 percent of the traffic and then after 5 minutes shift the remainder of the traffic. The entire deployment will take 5 minutes to cut over.
-
-CORRECT: "CodeDeployDefault.LambdaCanary10Percent5Minutes" is the correct answer.
-
-INCORRECT: "CodeDeployDefault.HalfAtATime" is incorrect as this is a CodeDeploy traffic shifting strategy that is not applicable to AWS Lambda. You can use Half at a Time with EC2 and on-premises instances.
-
-INCORRECT: "CodeDeployDefault.LambdaLinear10PercentEvery1Minute" is incorrect as this option will take longer. CodeDeploy will shift 10 percent every 1 minute and therefore the deployment time will be 10 minutes.
-
-INCORRECT: "CodeDeployDefault.LambdaLinear10PercentEvery2Minutes" is incorrect as this option will take longer. CodeDeploy will shift 10 percent every 2 minutes and therefore the deployment time will be 20 minutes.
+**❌ Неправильні варіанти:**
+- *HalfAtATime* — конфігурація для EC2 і on-premises, не для Lambda.
+- *LambdaLinear10PercentEvery1Minute* — займе 10 хвилин.
+- *LambdaLinear10PercentEvery2Minutes* — займе 20 хвилин.
 
 Джерела: <https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/automating-updates-to-serverless-apps.html>
 
@@ -325,7 +267,7 @@ INCORRECT: "CodeDeployDefault.LambdaLinear10PercentEvery2Minutes" is incorrect a
 
 <a id="t10-q13"></a>
 ### T10-Q13
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Networking & Content Delivery)*
+*домен: визначено автоматично (у джерелі: AWS Networking & Content Delivery)*
 
 > ⚠️ **Alias = статичний ARN.** → [детальніше](../../06-contradictions-and-traps.md#c13)
 
@@ -338,21 +280,16 @@ How can the Development team setup a static ARN that will point to the latest pu
 - ▫️ Setup a Route 53 Alias record that points to the published version
 - ✅ Setup an Alias that will point to the latest version
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-You can create one or more aliases for your AWS Lambda function. A Lambda alias is like a pointer to a specific Lambda function version. Users can access the function version using the alias ARN.
+**✅ Правильна відповідь: «Setup an Alias that will point to the latest version»**
 
-This is the best way to setup the Lambda function so you don’t need to modify the application code when a new version is published. Instead, the developer will simply need to update the Alias to point to the new version:
+Alias Lambda — вказівник на конкретну версію, і функцію викликають за ARN alias. Коли виходить нова версія, код застосунку не змінюють, а лише перенаправляють alias. Alias може вказувати на дві версії з вагами, що зручно для тестування нового коду.
 
-As you can see above you can also point to multiple versions and send a percentage of traffic to each. This is great for testing new code.
-
-CORRECT: "Setup an Alias that will point to the latest version" is the correct answer.
-
-INCORRECT: "Publish a mutable version and point it to the $LATEST version" is incorrect as all published versions are immutable (cannot be modified) and you cannot modify a published version to point to the $LATEST version.
-
-INCORRECT: "Use an unqualified ARN" is incorrect as this is an ARN that does not have a version number which means it points to the $LATEST version, not to a published version (as published versions always have version numbers).
-
-INCORRECT: "Setup a Route 53 Alias record that points to the published version" is incorrect as you cannot point a Route 53 Alias record to an AWS Lambda function.
+**❌ Неправильні варіанти:**
+- *Mutable version pointing to $LATEST* — опубліковані версії незмінні.
+- *Unqualified ARN* — ARN без версії вказує на `$LATEST`, а не на опубліковану версію.
+- *Route 53 Alias to Lambda* — Route 53 Alias-запис не може вказувати на Lambda.
 
 Джерела: <https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html>
 
@@ -362,7 +299,7 @@ INCORRECT: "Setup a Route 53 Alias record that points to the published version" 
 
 <a id="t10-q52"></a>
 ### T10-Q52
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **Окремий stage для beta.** → [детальніше](../../06-contradictions-and-traps.md#c13)
 
@@ -375,25 +312,16 @@ What would be the most efficient approach to meet these requirements?
 - ✅ Create a new version of the Lambda function. Build a new stage on API Gateway integrated with this new Lambda version. Utilize this new API Gateway stage for beta testing.
 - ▫️ Use the AWS CLI to manually switch between the old and new versions of the Lambda function during testing periods.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-In AWS, Lambda versions are an essential part of the deployment process. Once a version is published, the code within that version cannot be changed. It is ideal for ensuring stability and reliability between deployments.
+**✅ Правильна відповідь: «Create a new version of the Lambda function. Build a new stage on API Gateway integrated with this new Lambda version. Utilize this new API Gateway stage for beta testing.»**
 
-API Gateway Stages can be used to route traffic to different Lambda versions. Hence, creating a new API Gateway stage for beta testing that is linked to the new version of the Lambda function will ensure that existing users (using the old stage) are not impacted by the new feature.
+Опубліковану версію Lambda змінити не можна, тож вона гарантує стабільність між деплоями. Stages API Gateway можуть спрямовувати запити на різні версії Lambda. Окремий stage для бета-тестування, прив'язаний до нової версії, не зачіпає звичайних користувачів, які працюють зі старим stage.
 
-CORRECT: "Create a new version of the Lambda function. Build a new stage on API Gateway integrated with this new Lambda version. Utilize this new API Gateway stage for beta testing" is the correct answer (as explained above.)
-
-INCORRECT: "Implement Amazon S3 bucket versioning on the Lambda function code. For testing purposes, link the API Gateway to the new version of the code stored in the S3 bucket" is incorrect.
-
-While Amazon S3 versioning allows for keeping multiple variants of an object in the same bucket, it doesn't interact directly with AWS Lambda or API Gateway. Thus, you cannot control API Gateway to invoke different versions of Lambda function code stored in an S3 bucket.
-
-INCORRECT: "Use AWS CodeDeploy to deploy the updated Lambda function. Split traffic between the new and old versions of the function for testing purposes" is incorrect.
-
-AWS CodeDeploy can deploy new versions of Lambda functions and shift traffic gradually but using it for testing purposes might risk exposing beta features to the regular users, potentially impacting their experience.
-
-INCORRECT: "Use the AWS CLI to manually switch between the old and new versions of the Lambda function during testing periods" is incorrect.
-
-This approach is operationally intensive, prone to human error, and may impact regular users. AWS provides better ways of managing Lambda versions and aliases, which should be used instead of manual operations.
+**❌ Неправильні варіанти:**
+- *S3 versioning of Lambda code* — версіонування S3 не пов'язане з Lambda чи API Gateway; так вибрати версію функції неможливо.
+- *CodeDeploy traffic splitting* — частина звичайних користувачів побачить бета-функції.
+- *Manual CLI switching* — трудомістко, легко помилитися, і це зачепить користувачів.
 
 Джерела: <https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html>
 

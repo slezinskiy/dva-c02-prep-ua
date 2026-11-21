@@ -3,11 +3,11 @@
 **Домен 3 — Розгортання** · питань: 20  
 Теорія: [03-domain3-deployment.md](../../03-domain3-deployment.md#beanstalk) · [Протиріччя](../../06-contradictions-and-traps.md) · [Застарілі/сумнівні відповіді](../../07-outdated-and-wrong-answers.md) · [Усі розділи](../README.md)
 
-> Тексти питань і пояснення — оригінальні англійською (на екзамені теж англійська). ✅ — правильна відповідь за ключем банку, ❌ — твоя минула помилкова відповідь. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
+> Тексти питань і варіантів — англійською (як на екзамені), пояснення — українською. ✅ — правильна відповідь за ключем банку. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
 
 <a id="t01-q08"></a>
 ### T01-Q08
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 Your organization has set up a full CI/CD pipeline leveraging CodePipeline and the deployment is done on Elastic Beanstalk. This pipeline has worked for over a year now but you are approaching the limits of Elastic Beanstalk in terms of how many versions can be stored in the service.
 
@@ -18,29 +18,18 @@ How can you remove older versions that are not used by Elastic Beanstalk so that
 - ▫️ Setup an .ebextensions file
 - ▫️ Define a Lambda function
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Use a Lifecycle Policy»**
 
-Use a Lifecycle Policy
+Щоразу, коли ти завантажуєш нову версію застосунку через консоль Elastic Beanstalk або EB CLI, створюється application version. Якщо не видаляти непотрібні версії, рано чи пізно ти досягнеш ліміту і не зможеш створювати нові.
 
-Each time you upload a new version of your application with the Elastic Beanstalk console or the EB CLI, Elastic Beanstalk creates an application version. If you don't delete versions that you no longer use, you will eventually reach the application version limit and be unable to create new versions of that application.
+Щоб цього уникнути, налаштовують application version lifecycle policy: вона видаляє старі версії (за віком) або зайві, коли їх більше заданої кількості. Політика застосовується щоразу при створенні нової версії, видаляє до 100 версій за раз і не враховує нову версію в ліміт.
 
-You can avoid hitting the limit by applying an application version lifecycle policy to your applications. A lifecycle policy tells Elastic Beanstalk to delete old application versions or to delete application versions when the total number of versions for an application exceeds a specified number.
-
-Elastic Beanstalk applies an application's lifecycle policy each time you create a new application version and deletes up to 100 versions each time the lifecycle policy is applied. Elastic Beanstalk deletes old versions after creating the new version and does not count the new version towards the maximum number of versions defined in the policy.
-
- via - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-lifecycle.html
-
-Incorrect options: Setup an .ebextensions files - You can add AWS Elastic Beanstalk configuration files (.ebextensions) to your web application's source code to configure your environment and customize the AWS resources that it contains. This does not help with managing versions.
-
-Define a Lambda function - This could work but would require a lot of manual scripting, to achieve the same desired effect as the Lifecycle Policy EB feature.
-
-Use Worker Environments - This won't help. If your application performs operations or workflows that take a long time to complete, you can offload those tasks to a dedicated worker environment. Decoupling your web application front end from a process that performs blocking operations is a common way to ensure that your application stays responsive under load.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-lifecycle.html
+**❌ Неправильні варіанти:**
+- *Setup an .ebextensions file* — конфігурує середовище та його ресурси, але не керує версіями.
+- *Define a Lambda function* — спрацює, але вимагатиме багато ручних скриптів, щоб повторити вбудовану функцію Lifecycle Policy.
+- *Use Worker Environments* — призначені для довгих фонових задач і не допомагають керувати версіями.
 
 </details>
 
@@ -48,7 +37,7 @@ https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-lifecycle.ht
 
 <a id="t01-q58"></a>
 ### T01-Q58
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **EB: Rolling with additional batch, batch=1.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -61,27 +50,16 @@ Which of the following represents the most cost-effective deployment strategy fo
 - ▫️ Configure an Elastic Load Balancer to front the Auto Scaling Group and choose two different Availability Zones (AZs) for deployment
 - ✅ Opt for rolling with additional batch deployment strategy. Set the batch size parameter to 1
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Opt for rolling with additional batch deployment strategy. Set the batch size parameter to 1»**
 
-Opt for rolling with additional batch deployment strategy. Set the batch size parameter to 1
+При rolling-деплої Elastic Beanstalk ділить інстанси на батчі й оновлює їх по черзі; решта тим часом працює на старій версії. Щоб зберегти повну потужність, середовище спершу запускає додатковий батч нових інстансів і лише потім виводить старі з роботи — це **rolling with additional batch**. Після завершення додатковий батч термінується. Розмір батча задають у відсотках від ASG або фіксованою кількістю. Batch size = 1 — найдешевший варіант із повною потужністю.
 
-With rolling deployments, Elastic Beanstalk splits the environment's Amazon EC2 instances into batches and deploys the new version of the application to one batch at a time. It leaves the rest of the instances in the environment running the old version of the application. During a rolling deployment, some instances serve requests with the old version of the application, while instances in completed batches serve other requests with the new version.
-
-To maintain full capacity during deployments, you can configure your environment to launch a new batch of instances before taking any instances out of service. This option is known as a rolling deployment with an additional batch. When the deployment completes, Elastic Beanstalk terminates the additional batch of instances.
-
-For the rolling and rolling with additional batch deployment policies, you can configure Batch size – The size of the set of instances to deploy in each batch. Choose Percentage to configure a percentage of the total number of EC2 instances in the Auto Scaling group (up to 100 percent), or choose Fixed to configure a fixed number of instances (up to the maximum instance count in your environment's Auto Scaling configuration).
-
-Example configuration for rolling With additional batch:  via - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html#environments-cfg-rollingdeployments-method
-
-Incorrect options:
-
-Opt for a traffic-splitting deployment strategy with a traffic split parameter set to 50% of the total traffic - Traffic-splitting deployments let you perform canary testing as part of your application deployment. In a traffic-splitting deployment, Elastic Beanstalk launches a full set of new instances just like during an immutable deployment. It then forwards a specified percentage of incoming client traffic to the new application version for a specified evaluation period. This turns out to be a costly solution for the given use case.
-
-Configure an Elastic Load Balancer to front the Auto Scaling Group and choose two different Availability Zones (AZs) for deployment - Adding AZs makes the entire configuration resilient for failures post-deployment. However, it does not represent a valid deployment strategy for the given use case. This option has been added as a distractor.
-
-Opt for a rolling deployment strategy. Set the batch size to 2 - As already discussed, with rolling deployments, Elastic Beanstalk splits the environment's Amazon EC2 instances into batches and deploys the new version of the application to one batch at a time. With a batch size set to 2, only 1 instance will be left for traffic during deployment, impacting the performance of the e-commerce application. Hence, this option is incorrect.
+**❌ Неправильні варіанти:**
+- *Traffic-splitting with 50%* — EB запускає повний набір нових інстансів (як при immutable) і частину трафіку направляє на нову версію. Для цього випадку задорого.
+- *ELB перед ASG і два AZ* — підвищує стійкість, але не є стратегією деплою. Дистрактор.
+- *Rolling with batch size 2* — під час деплою трафік обслуговуватиме лише один інстанс, і продуктивність постраждає.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html>
 
@@ -91,7 +69,7 @@ Opt for a rolling deployment strategy. Set the batch size to 2 - As already disc
 
 <a id="t01-q62"></a>
 ### T01-Q62
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You have created a test environment in Elastic Beanstalk and as part of that environment, you have created an RDS database.
 
@@ -102,35 +80,16 @@ How can you make sure the database can be explored after the environment is dest
 - ▫️ Convert the Elastic Beanstalk environment to a worker environment
 - ✅ Make a snapshot of the database before it gets deleted
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Make a snapshot of the database before it gets deleted»**
 
-Make a snapshot of the database before it gets deleted
+RDS, створена всередині середовища Elastic Beanstalk, підходить для dev і тестування, але не для продакшну: життєвий цикл БД прив'язаний до середовища, і при його видаленні база теж видаляється разом з даними. Єдиний спосіб зберегти дані — зробити snapshot до видалення. Для продакшну БД відокремлюють від середовища (наприклад, через blue/green: нове середовище B підключають до наявної RDS).
 
-Use an Elastic Beanstalk blue (environment A)/green (environment B) deployment to decouple an RDS DB instance from environment.
-
-Create a new Elastic Beanstalk environment (environment B) with the necessary information to connect to the RDS DB instance.
-
-Note: An RDS DB instance attached to an Elastic Beanstalk environment is ideal for development and testing environments. However, it's not ideal for production environments because the lifecycle of the database instance is tied to the lifecycle of your application environment. If you terminate the environment, then you lose your data because the RDS DB instance is deleted by the environment. For more information, see Using Elastic Beanstalk with Amazon RDS.
-
-This is the only way to recover the database data before it gets deleted by Elastic Beanstalk.
-
-Please review this excellent document that addresses this use-case :
-
-https://aws.amazon.com/premiumsupport/knowledge-center/decouple-rds-from-beanstalk/
-
-Incorrect options:
-
-Make a selective delete in Elastic Beanstalk - This is not a feature in Elastic Beanstalk.
-
-Change the Elastic Beanstalk environment variables - Environment variables won't help with the provisioned RDS database.
-
-Convert the Elastic Beanstalk environment to a worker environment - You can't convert Elastic Beanstalk environments, you can only change their settings.
-
-Reference:
-
-https://aws.amazon.com/premiumsupport/knowledge-center/decouple-rds-from-beanstalk/
+**❌ Неправильні варіанти:**
+- *Make a selective delete in Elastic Beanstalk* — такої функції немає.
+- *Change the Elastic Beanstalk environment variables* — змінні середовища не захистять RDS від видалення.
+- *Convert the environment to a worker environment* — конвертувати середовища не можна, лише змінювати їхні налаштування.
 
 </details>
 
@@ -138,33 +97,28 @@ https://aws.amazon.com/premiumsupport/knowledge-center/decouple-rds-from-beansta
 
 <a id="t02-q03"></a>
 ### T02-Q03
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 An application on-premises uses Linux servers and a relational database using PostgreSQL. The company will be migrating the application to AWS and require a managed service that will take care of capacity provisioning, load balancing, and auto-scaling.
 
 Which combination of services should the Developer use? (Select TWO.)
 
-- ❌ Amazon EC2 with Auto Scaling
+- ▫️ Amazon EC2 with Auto Scaling
 - ✅ AWS Elastic Beanstalk
 - ▫️ AWS Lambda with CloudWatch Events
 - ▫️ Amazon EC2 with PostgreSQL
 - ✅ Amazon RDS with PostrgreSQL
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-The company require a managed service therefore the Developer should choose to use Elastic Beanstalk for the compute layer and Amazon RDS with the PostgreSQL engine for the database layer.
+**✅ Правильні відповіді: «AWS Elastic Beanstalk» та «Amazon RDS with PostgreSQL»**
 
-AWS Elastic Beanstalk will handle all capacity provisioning, load balancing, and auto-scaling for the web front-end and Amazon RDS provides push-button scaling for the backend.
+Потрібен керований сервіс: Elastic Beanstalk для обчислень (сам провізіонує потужності, балансує навантаження, масштабує) і Amazon RDS з рушієм PostgreSQL для БД (масштабування «натисканням кнопки»).
 
-CORRECT: "AWS Elastic Beanstalk" is a correct answer.
-
-CORRECT: "Amazon RDS with PostrgreSQL" is also a correct answer.
-
-INCORRECT: "Amazon EC2 with Auto Scaling" is incorrect as though these services will be used to provide the automatic scalability required for the solution, they still need to be managed. The questions asks for a managed solution and Elastic Beanstalk will manage this for you. Also, there is no mention of a load balancer so connections cannot be distributed to instances.
-
-INCORRECT: "Amazon EC2 with PostgreSQL" is incorrect as the question asks for a managed service and therefore the database should be run on Amazon RDS.
-
-INCORRECT: "AWS Lambda with CloudWatch Events" is incorrect as there is no mention of refactoring application code to run on AWS Lambda.
+**❌ Неправильні варіанти:**
+- *Amazon EC2 with Auto Scaling* — дає масштабування, але це треба керувати самостійно; до того ж немає балансера.
+- *Amazon EC2 with PostgreSQL* — це не керований сервіс; БД має бути на RDS.
+- *AWS Lambda with CloudWatch Events* — про переписування застосунку під Lambda не йдеться.
 
 Джерела: <https://aws.amazon.com/elasticbeanstalk/> · <https://aws.amazon.com/rds/postgresql/>
 
@@ -174,7 +128,7 @@ INCORRECT: "AWS Lambda with CloudWatch Events" is incorrect as there is no menti
 
 <a id="t02-q50"></a>
 ### T02-Q50
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **Документація: 500 MB (у банку 512 MB).** → [детальніше](../../07-outdated-and-wrong-answers.md#o10)
 
@@ -184,31 +138,25 @@ Which of the following are valid requirements for creating the source bundle? (S
 
 - ▫️ Must include a parent folder or top-level directory.
 - ✅ Must not include a parent folder or top-level directory.
-- ❌ Must consist of one or more ZIP files.
+- ▫️ Must consist of one or more ZIP files.
 - ▫️ Must include the cron.yaml file.
 - ✅ Must not exceed 512 MB.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-When you use the AWS Elastic Beanstalk console to deploy a new application or an application version, you'll need to upload a source bundle. Your source bundle must meet the following requirements:
+**✅ Правильні відповіді: «Must not include a parent folder or top-level directory» та «Must not exceed 512 MB»**
 
-  •  Consist of a single ZIP file or WAR file (you can include multiple WAR files inside your ZIP file)
+Для деплою через консоль Elastic Beanstalk source bundle має:
+- складатися з одного ZIP або WAR файлу (усередині ZIP може бути кілька WAR);
+- не перевищувати 512 MB (у поточній документації — 500 MB);
+- не містити кореневої (батьківської) папки; підкаталоги допускаються.
 
-  •  Not exceed 512 MB
+`cron.yaml` потрібен лише для worker-застосунків з періодичними задачами.
 
-  •  Not include a parent folder or top-level directory (subdirectories are fine)
-
-If you want to deploy a worker application that processes periodic background tasks, your application source bundle must also include a cron.yaml file, but in other cases it is not required.
-
-CORRECT: "Must not include a parent folder or top-level directory" is a correct answer.
-
-CORRECT: "Must not exceed 512 MB" is also a correct answer.
-
-INCORRECT: "Must include the cron.yaml file" is incorrect. As mentioned above, this is not required in all cases.
-
-INCORRECT: "Must include a parent folder or top-level directory" is incorrect. A parent folder or top-level directory must NOT be included.
-
-INCORRECT: "Must consist of one or more ZIP files" is incorrect. You bundle into a single ZIP or WAR file.
+**❌ Неправильні варіанти:**
+- *Must include the cron.yaml file* — потрібен не завжди.
+- *Must include a parent folder* — навпаки, батьківської папки бути НЕ повинно.
+- *Must consist of one or more ZIP files* — лише один ZIP або WAR.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/applications-sourcebundle.html>
 
@@ -218,7 +166,7 @@ INCORRECT: "Must consist of one or more ZIP files" is incorrect. You bundle into
 
 <a id="t03-q12"></a>
 ### T03-Q12
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **EB: dev, downtime OK → All at once.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -231,27 +179,16 @@ Which of the following deployment policies meet your needs?
 - ▫️ Rolling with additional batches
 - ▫️ Rolling
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «All at once»**
 
-All at once
+Найшвидший метод деплою; підходить, якщо короткий простій прийнятний, а важлива швидкість. EB ставить нову версію на всі інстанси одночасно; веб-проксі або сервер застосунку може перезапуститися, тож застосунок на короткий час недоступний.
 
-This is the quickest deployment method. Suitable if you can accept a short loss of service, and if quick deployments are important to you. With this method, Elastic Beanstalk deploys the new application version to each instance. Then, the web proxy or application server might need to restart. As a result, your application might be unavailable to users (or have low availability) for a short time.
-
-Overview of Elastic Beanstalk Deployment Policies:  via - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
-
-Incorrect options:
-
-Rolling - With this method, your application is deployed to your environment one batch of instances at a time. Most bandwidth is retained throughout the deployment. Avoids downtime and minimizes reduced availability, at a cost of a longer deployment time. Suitable if you can't accept any period of completely lost service.
-
-Rolling with additional batches - With this method, Elastic Beanstalk launches an extra batch of instances, then performs a rolling deployment. Launching the extra batch takes time, and ensures that the same bandwidth is retained throughout the deployment. This policy also avoids any reduced availability, although at a cost of an even longer deployment time compared to the Rolling method. Finally, this option is suitable if you must maintain the same bandwidth throughout the deployment.
-
-Immutable - A slower deployment method, that ensures your new application version is always deployed to new instances, instead of updating existing instances. It also has the additional advantage of a quick and safe rollback in case the deployment fails. With this method, Elastic Beanstalk performs an immutable update to deploy your application. In an immutable update, a second Auto Scaling group is launched in your environment and the new version serves traffic alongside the old version until the new instances pass health checks.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
+**❌ Неправильні варіанти:**
+- *Rolling* — деплой батчами; більша частина потужності зберігається, повного простою немає, але деплой довший.
+- *Rolling with additional batch* — спершу запускається додатковий батч, потужність повністю зберігається, але деплой ще довший.
+- *Immutable* — повільніший: нова версія завжди на нових інстансах (друга ASG), з швидким і безпечним rollback.
 
 </details>
 
@@ -259,7 +196,7 @@ https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-exi
 
 <a id="t04-q15"></a>
 ### T04-Q15
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **EB: швидкий rollback → Immutable.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -272,43 +209,23 @@ What deployment method should be used?
 - ▫️ Rolling
 - ▫️ All at once
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Elastic Beanstalk provides several options for how deployments are processed, including deployment policies and options that let you configure batch size and health check behavior during deployments.
+**✅ Правильна відповідь: «Immutable»**
 
-All at once:
+Політики деплою Elastic Beanstalk:
+- **All at once** — усі інстанси одночасно;
+- **Rolling** — батчами, один батч щоразу недоступний;
+- **Rolling with additional batch** — як Rolling, але з додатковим батчем для повної доступності;
+- **Immutable** — нові інстанси в новій ASG, трафік перемикається, коли вони healthy; zero downtime;
+- **Blue/Green** — окреме середовище, zero downtime.
 
-• Deploys the new version to all instances simultaneously.
+Immutable — найбезпечніший варіант без простою і з простим rollback (досить видалити нові інстанси).
 
-Rolling:
-
-• Update a few instances at a time (bucket), and then move onto the next bucket once the first bucket is healthy (downtime for 1 bucket at a time).
-
-Rolling with additional batch:
-
-• Like Rolling but launches new instances in a batch ensuring that there is full availability.
-
-Immutable:
-
-• Launches new instances in a new ASG and deploys the version update to these instances before swapping traffic to these instances once healthy.
-
-• Zero downtime.
-
-Blue / Green deployment:
-
-• Zero downtime and release facility.
-
-• Create a new “stage” environment and deploy updates there.
-
-For this scenario, the best choice is Immutable as this is the safest option when you cannot tolerate downtime and also provides a simple way of rolling back should an issue occur.
-
-CORRECT: "Immutable" is the correct answer.
-
-INCORRECT: "All at once" is incorrect as this will take all instances down and cause a total outage.
-
-INCORRECT: "Snapshots" is incorrect as this is not a deployment method you can use with Elastic Beanstalk.
-
-INCORRECT: "Rolling" is incorrect as this will reduce the capacity of the application and it is more difficult to roll back as you must redeploy the old version to the instances.
+**❌ Неправильні варіанти:**
+- *All at once* — повний простій.
+- *Snapshots* — не метод деплою EB.
+- *Rolling* — знижує потужність, а rollback складніший: доведеться заново розгортати стару версію.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html>
 
@@ -318,7 +235,7 @@ INCORRECT: "Rolling" is incorrect as this will reduce the capacity of the applic
 
 <a id="t05-q28"></a>
 ### T05-Q28
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A developer is planning the deployment of a new version of an application to AWS Elastic Beanstalk. The new version of the application should be deployed only to new EC2 instances.
 
@@ -330,45 +247,23 @@ Which deployment methods will meet these requirements? (Select TWO.)
 - ✅ Immutable
 - ▫️ All at once
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Elastic Beanstalk provides several options for how deployments are processed, including deployment policies and options that let you configure batch size and health check behavior during deployments.
+**✅ Правильна відповідь: «Blue/green» + «Immutable»**
 
-All at once:
+Політики деплою Elastic Beanstalk:
+- **All at once** — нова версія на всі інстанси одночасно.
+- **Rolling** — оновлює групи інстансів (buckets) по черзі; поки оновлюється одна група, вона недоступна.
+- **Rolling with additional batch** — як Rolling, але спочатку запускає додаткову групу, тож повна потужність зберігається.
+- **Immutable** — нові інстанси в новій ASG; трафік перемикається, коли вони здорові. Zero downtime.
+- **Blue/Green** — окреме нове середовище, потім swap URL. Zero downtime.
 
-• Deploys the new version to all instances simultaneously.
+Лише Immutable і Blue/Green деплоять оновлення виключно на нові EC2.
 
-Rolling:
-
-• Update a few instances at a time (bucket), and then move onto the next bucket once the first bucket is healthy (downtime for 1 bucket at a time).
-
-Rolling with additional batch:
-
-• Like Rolling but launches new instances in a batch ensuring that there is full availability.
-
-Immutable:
-
-• Launches new instances in a new ASG and deploys the version update to these instances before swapping traffic to these instances once healthy.
-
-• Zero downtime.
-
-Blue / Green deployment:
-
-• Zero downtime and release facility.
-
-• Create a new “stage” environment and deploy updates there.
-
-The immutable and blue/green options both provide zero downtime as they will deploy the new version to a new version of the application. These are also the only two options that will ONLY deploy the updates to new EC2 instances.
-
-CORRECT: "Immutable" is the correct answer.
-
-CORRECT: "Blue/green" is the correct answer.
-
-INCORRECT: "All-at-once" is incorrect as this will deploy the updates to existing instances.
-
-INCORRECT: "Rolling" is incorrect as this will deploy the updates to existing instances.
-
-INCORRECT: "Rolling with additional batch" is incorrect as this will launch new instances but will also update the existing instances as well (which is not allowed according to the requirements).
+**❌ Неправильні варіанти:**
+- *All-at-once* — оновлює наявні інстанси.
+- *Rolling* — оновлює наявні інстанси.
+- *Rolling with additional batch* — запускає нові інстанси, але оновлює й наявні, що за умовою заборонено.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html> · <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html>
 
@@ -378,7 +273,7 @@ INCORRECT: "Rolling with additional batch" is incorrect as this will launch new 
 
 <a id="t05-q47"></a>
 ### T05-Q47
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **EB: без втрати потужності, найдешевше → Rolling with additional batch.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -391,43 +286,24 @@ Which deployment policy is the most cost-effective choice to suit these requirem
 - ▫️ All at once
 - ✅ Rolling with additional batch
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Elastic Beanstalk provides several options for how deployments are processed, including deployment policies and options that let you configure batch size and health check behavior during deployments.
+**✅ Правильна відповідь: «Rolling with additional batch»**
 
-Each deployment policy has advantages and disadvantages and it’s important to select the best policy to use for each situation. The following tables summarizes the different deployment policies:
+Кожна політика деплою Elastic Beanstalk має свої плюси й мінуси. Rolling with additional batch спочатку додає нову групу інстансів, оновлює її, а потім переходить до наступної групи. Особливості:
+- застосунок весь час працює на повній потужності;
+- розмір групи можна задати;
+- певний час одночасно працюють обидві версії;
+- невелика додаткова вартість; зайва група видаляється наприкінці;
+- деплой триває довше;
+- добре підходить для продакшну.
 
-The “rolling with additional batch” policy will add an additional batch of instances, updates those instances, then move onto the next batch.
+За умовою продуктивність і доступність не можуть знижуватися, а рішення має бути найдешевшим. Ця політика дає повну доступність за мінімальних витрат, бо додаткову групу можна зробити маленькою.
 
-Rolling with additional batch:
-
-Like Rolling but launches new instances in a batch ensuring that there is full availability.
-
-Application is running at capacity.
-
-Can set the bucket size.
-
-Application is running both versions simultaneously.
-
-Small additional cost.
-
-Additional batch is removed at the end of the deployment.
-
-Longer deployment.
-
-Good for production environments.
-
-For this scenario there can be no reduction in application performance and availability during the update. The question also asks for the most cost-effective choice.
-
-Therefore, the “rolling with additional batch” is the best choice as it will ensure fully availability of the application but minimize cost as the additional batch size can be kept small.
-
-CORRECT: "Rolling with additional batch" is the correct answer.
-
-INCORRECT: "Rolling" is incorrect as this will result in a reduction in capacity as there is no additional batch of instances introduced to the environment. This is a better choice if speed is required and a reduction in capacity of a batch size is acceptable.
-
-INCORRECT: "All at once" is incorrect as this will take the application down and cause a complete outage of the application during the update.
-
-INCORRECT: "Immutable" is incorrect as this is the most expensive option as it doubles capacity with a whole new set of instances attached to a new ASG.
+**❌ Неправильні варіанти:**
+- *Rolling* — потужність тимчасово зменшується на одну групу. Добрий вибір, коли важлива швидкість і таке зменшення допустиме.
+- *All at once* — повний простій під час оновлення.
+- *Immutable* — найдорожчий: подвоює потужність повним набором інстансів у новій ASG.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html> · <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html>
 
@@ -437,7 +313,7 @@ INCORRECT: "Immutable" is incorrect as this is the most expensive option as it d
 
 <a id="t06-q49"></a>
 ### T06-Q49
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **EB: без downtime + легкий rollback → Immutable.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -448,25 +324,18 @@ What deployment method should be used?
 - ▫️ Incremental
 - ▫️ Rolling
 - ✅ Immutable
-- ❌ All at once
+- ▫️ All at once
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-The immutable deployment type launches new instances in a new ASG and deploys the version update to these instances before swapping traffic to these instances once healthy. There is zero downtime and a quick rollback in case of failures.
+**✅ Правильна відповідь: «Immutable»**
 
-CORRECT: "Immutable" is the correct answer (as explained above.)
+Immutable-деплой запускає нові інстанси в новій ASG, розгортає на них нову версію і перемикає трафік, коли вони здорові. Простою немає, а при збої відкат швидкий: нові інстанси просто видаляються.
 
-INCORRECT: "Rolling" is incorrect.
-
-With a rolling update a few instances are updated at a time (batch), and then the deployment moves onto the next batch once the first batch is healthy. Each batch is taken out of service during deployment leading to downtime. If the update fails, you need to perform an additional rolling update to roll back the changes. This would not be ideal for this production environment.
-
-INCORRECT: "All at once" is incorrect.
-
-This would take all instances down at the same time. This is not suitable for a production environment.
-
-INCORRECT: "Incremental" is incorrect.
-
-This is not actually a type of deployment model in Elastic Beanstalk.
+**❌ Неправильні варіанти:**
+- *Rolling* — оновлює групи інстансів по черзі, і кожна група під час деплою виведена з обслуговування. При збої потрібен ще один rolling update для відкату. Для продакшну не ідеально.
+- *All at once* — усі інстанси недоступні одночасно; для продакшну не підходить.
+- *Incremental* — такої політики деплою в Elastic Beanstalk немає.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environmentmgmt-updates-immutable.html>
 
@@ -476,7 +345,7 @@ This is not actually a type of deployment model in Elastic Beanstalk.
 
 <a id="t08-q27"></a>
 ### T08-Q27
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **EB: пріоритет rollback → Immutable.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -489,39 +358,24 @@ Which deployment policy should the Developer choose?
 - ▫️ All at once
 - ▫️ Rolling
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Elastic Beanstalk provides several options for how deployments are processed, including deployment policies and options that let you configure batch size and health check behavior during deployments.
+**✅ Правильна відповідь: «Immutable»**
 
-Each deployment policy has advantages and disadvantages and it’s important to select the best policy to use for each situation. The following tables summarizes the different deployment policies:
+Immutable-деплой створює нову ASG з новим набором інстансів і розгортає оновлення туди. Особливості:
+- трафік перемикається, коли нові інстанси здорові;
+- простою немає;
+- дорого: під час оновлення інстансів удвічі більше;
+- найдовший деплой;
+- **швидкий відкат**, бо старі інстанси лишаються незмінними;
+- чудово для продакшну.
 
-The “immutable” policy will create a new ASG with a whole new set of instances and deploy the updates there.
+Тут швидкий відкат важливіший за все інше, тож Immutable — найкращий вибір, хоч він найдорожчий і найдовший.
 
-Immutable:
-
-• Launches new instances in a new ASG and deploys the version update to these instances before swapping traffic to these instances once healthy.
-
-• Zero downtime.
-
-• New code is deployed to new instances using an ASG.
-
-• High cost as double the number of instances running during updates.
-
-• Longest deployment.
-
-• Quick rollback in case of failures.
-
-• Great for production environments.
-
-For this scenario a quick rollback must be prioritized over all other considerations. Therefore, the best choice is “immutable”. This deployment policy is the most expensive and longest (duration) option. However, you can roll back quickly and safely as the original instances are all available and unmodified.
-
-CORRECT: "Immutable" is the correct answer.
-
-INCORRECT: "Rolling" is incorrect as this policy requires manual redeployment if there are any issues caused by the update.
-
-INCORRECT: "Rolling with additional batch" is incorrect as this policy requires manual redeployment if there are any issues caused by the update.
-
-INCORRECT: "All at once" is incorrect as this takes the entire environment down at once and requires manual redeployment if there are any issues caused by the update.
+**❌ Неправильні варіанти:**
+- *Rolling* — при проблемах потрібен ручний повторний деплой.
+- *Rolling with additional batch* — при проблемах теж потрібен ручний повторний деплой.
+- *All at once* — повний простій і ручний повторний деплой при проблемах.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html> · <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html>
 
@@ -531,7 +385,7 @@ INCORRECT: "All at once" is incorrect as this takes the entire environment down 
 
 <a id="t08-q33"></a>
 ### T08-Q33
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A Developer needs to configure an Elastic Load Balancer that is deployed through AWS Elastic Beanstalk. Where should the Developer place the load-balancer.config file in the application source bundle?
 
@@ -540,37 +394,22 @@ A Developer needs to configure an Elastic Load Balancer that is deployed through
 - ✅ In the .ebextensions folder
 - ▫️ In the load-balancer.config.root
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-You can add AWS Elastic Beanstalk configuration files (.ebextensions) to your web application's source code to configure your environment and customize the AWS resources that it contains.
+**✅ Правильна відповідь: «In the .ebextensions folder»**
 
-Configuration files are YAML- or JSON-formatted documents with a .config file extension that you place in a folder named .ebextensions and deploy in your application source bundle.
+Конфігураційні файли `.ebextensions` у вихідному коді налаштовують середовище Elastic Beanstalk і його ресурси. Наприклад, файл `.ebextensions/load-balancer.config` може змінити тип балансувальника на Network Load Balancer.
 
-For example, you could include a configuration file for setting the load balancer type into:
+Вимоги до файлів:
+- **Розташування** — одна папка `.ebextensions` у корені source bundle. Папки з крапкою можуть бути приховані, тож переконайтеся, що вона потрапила в архів.
+- **Ім'я** — розширення `.config`.
+- **Формат** — YAML або JSON.
+- **Унікальність** — кожен ключ лише один раз у файлі.
 
-.ebextensions/load-balancer.config
-
-This example makes a simple configuration change. It modifies a configuration option to set the type of your environment's load balancer to Network Load Balancer:
-
-Requirements
-
-•  Location – Place all of your configuration files in a single folder, named .ebextensions, in the root of your source bundle. Folders starting with a dot can be hidden by file browsers, so make sure that the folder is added when you create your source bundle.
-
-•  Naming – Configuration files must have the .config file extension.
-
-•  Formatting – Configuration files must conform to YAML or JSON specifications.
-
-•  Uniqueness – Use each key only once in each configuration file.
-
-Therefore, the Developer should place the file in the .ebextensions folder in the application source bundle.
-
-CORRECT: "In the .ebextensions folder" is the correct answer.
-
-INCORRECT: "In the root of the source code" is incorrect. You need to place .config files in the .ebextensions folder.
-
-INCORRECT: "In the bin folder" is incorrect. You need to place .config files in the .ebextensions folder.
-
-INCORRECT: "In the load-balancer.config.root" is incorrect. You need to place .config files in the .ebextensions folder.
+**❌ Неправильні варіанти:**
+- *Root of the source code* — `.config` файли кладуть у `.ebextensions`.
+- *bin folder* — `.config` файли кладуть у `.ebextensions`.
+- *load-balancer.config.root* — такого розташування не існує.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html>
 
@@ -580,7 +419,7 @@ INCORRECT: "In the load-balancer.config.root" is incorrect. You need to place .c
 
 <a id="t09-q09"></a>
 ### T09-Q09
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You are a developer working on a web application written in Java and would like to use AWS Elastic Beanstalk for deployment because it would handle deployment, capacity provisioning, load balancing, auto-scaling, and application health monitoring. In the past, you connected to your provisioned instances through SSH to issue configuration commands. Now, you would like a configuration mechanism that automatically applies settings for you.
 
@@ -591,23 +430,16 @@ Which of the following options would help do this?
 - ▫️ Deploy a CloudFormation wrapper
 - ▫️ Use SSM parameter store as an input to your Elastic Beanstalk Configurations
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Include config files in .ebextensions/ at the root of your source code»**
 
-Include config files in .ebextensions/ at the root of your source code
+Секція `option_settings` конфігураційного файлу задає значення опцій конфігурації: середовища Elastic Beanstalk, ресурсів у ньому та ПЗ застосунку. Файли в `.ebextensions/` — один із кількох способів задати ці опції.
 
-The option_settings section of a configuration file defines values for configuration options. Configuration options let you configure your Elastic Beanstalk environment, the AWS resources in it, and the software that runs your application. Configuration files are only one of several ways to set configuration options.
-
- via - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html
-
-Incorrect options:
-
-Deploy a CloudFormation wrapper - This is a made-up option. This has been added as a distractor.
-
-Use SSM parameter store as an input to your Elastic Beanstalk Configurations - SSM parameter is still not supported for Elastic Beanstalk. So this option is incorrect.
-
-Use an AWS Lambda hook - Lambda functions are not the best-fit to trigger these configuration changes as it would involve significant development effort.
+**❌ Неправильні варіанти:**
+- *CloudFormation wrapper* — такої функції немає.
+- *SSM Parameter Store as input* — у логіці тесту не підтримується. ℹ️ Новіші версії Elastic Beanstalk уміють брати змінні середовища із Secrets Manager або Parameter Store, але на іспиті для конфігурації середовища ключ — `.ebextensions`.
+- *Lambda hook* — забагато розробки.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html> · <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions-optionsettings.html>
 
@@ -617,7 +449,7 @@ Use an AWS Lambda hook - Lambda functions are not the best-fit to trigger these 
 
 <a id="t10-q11"></a>
 ### T10-Q11
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 > ⚠️ **EB: зміна платформи → Blue/Green (CNAME swap).** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -630,23 +462,21 @@ Which strategy should the team adopt to fulfill these requirements?
 - ✅ Implement Blue/Green (CNAME Swap) deployment using Elastic Beanstalk. Prepare a separate environment with the new version of Node.js and the new code, and once testing is complete, swap the CNAMEs of the two environments.
 - ▫️ Upgrade the platform version of the current Elastic Beanstalk environment, then deploy the new application code. Monitor the application and quickly roll back changes if any issues occur.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-The Blue/Green deployment strategy involves creating a separate environment (the 'green' environment) with the new application version and platform updates. It allows full testing and validation. Once you're confident in the 'green' environment, you can swap the environment URLs to redirect traffic to the new environment. This results in zero downtime.
+**✅ Правильна відповідь: «Implement Blue/Green (CNAME Swap) deployment using Elastic Beanstalk. Prepare a separate environment with the new version of Node.js and the new code, and once testing is complete, swap the CNAMEs of the two environments.»**
 
-CORRECT: "Implement Blue/Green (CNAME Swap) deployment using Elastic Beanstalk. Prepare a separate environment with the new version of Node.js and the new code, and once testing is complete, swap the CNAMEs of the two environments" is the correct answer (as explained above.)
+Blue/Green-деплой:
+1. Створюють окреме green-середовище з новою версією застосунку і оновленою платформою (Node.js).
+2. Повністю його тестують.
+3. Міняють місцями URL середовищ (Swap environment URLs).
 
-INCORRECT: "Upgrade the platform version of the current Elastic Beanstalk environment, then deploy the new application code. Monitor the application and quickly roll back changes if any issues occur" is incorrect.
+Простою немає, а відкат — зворотний swap.
 
-This approach introduces risks that could result in downtime during the upgrade and deployment process. If any issues occur during the upgrade or after the deployment of the new application code, rolling back these changes could cause further downtime.
-
-INCORRECT: "Create a duplicate EC2 instance manually with the new version of Node.js and the updated code. Test the new instance and replace one of the instances behind the ELB once the testing is successful" is incorrect.
-
-Managing the process manually and replacing instances behind the load balancer may result in inconsistencies and is not as streamlined or reliable as using the deployment and environment management capabilities of Elastic Beanstalk.
-
-INCORRECT: "Use a rolling deployment for the new application code. Apply the code to a subset of EC2 instances until the tests pass. Redeploy the previous code if the tests fail" is incorrect.
-
-While AWS CodeDeploy is a robust deployment service, performing the platform upgrade manually after the code deployment doesn't guarantee zero downtime, as the platform upgrade might require a restart of the EC2 instances, causing service interruptions.
+**❌ Неправильні варіанти:**
+- *Upgrade the platform in place* — ризик простою під час оновлення, і відкат теж може спричинити простій.
+- *Duplicate EC2 manually* — ручний процес, що веде до розбіжностей і менш надійний за інструменти Beanstalk.
+- *Rolling deployment, platform later* — оновлення платформи може перезапускати інстанси, тож zero downtime не гарантовано.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.CNAMESwap.html>
 
@@ -656,7 +486,7 @@ While AWS CodeDeploy is a robust deployment service, performing the platform upg
 
 <a id="t11-q15"></a>
 ### T11-Q15
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **EB: Rolling with additional batch.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -669,27 +499,18 @@ Which of the following is the MOST optimal way to do this while keeping the solu
 - ✅ Deploy using 'Rolling with additional batch' deployment policy
 - ▫️ Deploy using 'Immutable' deployment policy
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Deploy using 'Rolling with additional batch' deployment policy»**
 
-AWS Elastic Beanstalk offers several deployment policies and settings. Choosing the right deployment policy for your application is a tradeoff based on a few considerations and depends on your business needs.
+Вибір політики деплою Elastic Beanstalk — це компроміс, що залежить від потреб бізнесу. **Rolling with additional batch** спочатку запускає додаткову групу інстансів, а потім виконує rolling-деплой. Потужність під час деплою не падає, хоч деплой і довший, ніж Rolling. Підходить, коли треба зберегти повну потужність.
 
-Deploy using 'Rolling with additional batch' deployment policy - With this method, Elastic Beanstalk launches an extra batch of instances, then performs a rolling deployment. Launching the extra batch takes time, and ensures that the same bandwidth is retained throughout the deployment. This policy also avoids any reduced availability, although at a cost of an even longer deployment time compared to the Rolling method. Finally, this option is suitable if you must maintain the same bandwidth throughout the deployment.
+Огляд політик: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
 
-Overview of Elastic Beanstalk Deployment Policies:  via - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
-
-Incorrect options:
-
-Deploy using 'Immutable' deployment policy - A slower deployment method, that ensures your new application version is always deployed to new instances, instead of updating existing instances. It also has the additional advantage of a quick and safe rollback in case the deployment fails. With this method, Elastic Beanstalk performs an immutable update to deploy your application. In an immutable update, a second Auto Scaling group is launched in your environment and the new version serves traffic alongside the old version until the new instances pass health checks.
-
-Deploy using 'All at once' deployment policy - This is the quickest deployment method. Suitable if you can accept a short loss of service, and if quick deployments are important to you. With this method, Elastic Beanstalk deploys the new application version to each instance. Then, the web proxy or application server might need to restart. As a result, your application might be unavailable to users (or have low availability) for a short time.
-
-Deploy using 'Rolling' deployment policy - With this method, your application is deployed to your environment one batch of instances at a time. Most bandwidth is retained throughout the deployment. Avoids downtime and minimizes reduced availability, at a cost of a longer deployment time. Suitable if you can't accept any period of completely lost service. The use case states that the application has high traffic and high availability requirements, so full capacity must be maintained during deployments, hence rolling with additional batch deployment is a better fit than the rolling deployment.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
+**❌ Неправильні варіанти:**
+- *Immutable* — повільніше й дорожче: друга ASG з повним набором нових інстансів. Перевага — швидкий безпечний відкат, але тут найкращий баланс дає rolling з додатковою групою.
+- *All at once* — найшвидше, але можливий короткий простій.
+- *Rolling* — без простою, але потужність падає на одну групу. Трафік високий, тож потрібна повна потужність.
 
 </details>
 
@@ -697,7 +518,7 @@ https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-exi
 
 <a id="t11-q23"></a>
 ### T11-Q23
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 When running a Rolling deployment in Elastic Beanstalk environment, only two batches completed the deployment successfully, while rest of the batches failed to deploy the updated version. Following this, the development team terminated the instances from the failed deployment.
 
@@ -708,29 +529,21 @@ What will be the status of these failed instances post termination?
 - ▫️ Elastic Beanstalk will replace the failed instances after the application version to be installed is manually chosen from AWS Console
 - ▫️ Elastic Beanstalk will replace the failed instances with instances running the application version from the oldest successful deployment
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Elastic Beanstalk will replace the failed instances with instances running the application version from the most recent successful deployment»**
 
-Elastic Beanstalk will replace them with instances running the application version from the most recent successful deployment
+Під час rolling-деплою Beanstalk відключає інстанси групи від балансувальника, розгортає нову версію і знову їх підключає. З connection draining спершу дочікується завершення наявних з'єднань.
 
-When processing a batch, Elastic Beanstalk detaches all instances in the batch from the load balancer, deploys the new application version, and then reattaches the instances. If you enable connection draining, Elastic Beanstalk drains existing connections from the Amazon EC2 instances in each batch before beginning the deployment.
+Якщо деплой зірвався після кількох успішних груп:
+- завершені групи працюють на новій версії, решта — на старій;
+- версію кожного інстансу видно на сторінці health в консолі;
+- якщо термінувати інстанси невдалого деплою, Beanstalk замінить їх інстансами з версією **останнього успішного деплою**.
 
-If a deployment fails after one or more batches completed successfully, the completed batches run the new version of your application while any pending batches continue to run the old version. You can identify the version running on the instances in your environment on the health page in the console. This page displays the deployment ID of the most recent deployment that was executed on each instance in your environment. If you terminate instances from the failed deployment, Elastic Beanstalk replaces them with instances running the application version from the most recent successful deployment.
-
-Incorrect options:
-
-Elastic Beanstalk will not replace the failed instances
-
-Elastic Beanstalk will replace the failed instances with instances running the application version from the oldest successful deployment
-
-Elastic Beanstalk will replace the failed instances after the application version to be installed is manually chosen from AWS Console
-
-These three options contradict the explanation provided above, so these options are incorrect.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html
+**❌ Неправильні варіанти:**
+- *Will not replace* — замінює.
+- *Oldest successful deployment* — береться останній успішний деплой.
+- *After manual choice in Console* — замінює автоматично.
 
 </details>
 
@@ -738,7 +551,7 @@ https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-ve
 
 <a id="t11-q33"></a>
 ### T11-Q33
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 After a test deployment in ElasticBeanstalk environment, a developer noticed that all accumulated Amazon EC2 burst balances were lost.
 
@@ -749,30 +562,22 @@ Which of the following options can lead to this behavior?
 - ▫️ The deployment was run as a All-at-once deployment, flushing all the accumulated EC2 burst balances
 - ▫️ When a canary deployment fails, it resets the EC2 burst balances to zero
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «The deployment was either run with immutable updates or in traffic splitting mode»**
 
-The deployment was either run with immutable updates or in traffic splitting mode - Immutable deployments perform an immutable update to launch a full set of new instances running the new version of the application in a separate Auto Scaling group, alongside the instances running the old version. Immutable deployments can prevent issues caused by partially completed rolling deployments.
+- **Immutable** запускає повний набір нових інстансів з новою версією в окремій ASG поруч зі старими. Так уникають проблем частково завершених rolling-деплоїв.
+- **Traffic splitting** — canary-тестування в Beanstalk: так само повний набір нових інстансів, на які на заданий час іде вказаний відсоток трафіку.
 
-Traffic-splitting deployments let you perform canary testing as part of your application deployment. In a traffic-splitting deployment, Elastic Beanstalk launches a full set of new instances just like during an immutable deployment. It then forwards a specified percentage of incoming client traffic to the new application version for a specified evaluation period.
+Політики, що замінюють **усі** інстанси, втрачають накопичені EC2 burst credits:
+- керовані оновлення платформи із заміною інстансів;
+- immutable-оновлення;
+- деплої з immutable або traffic splitting.
 
-Some policies replace all instances during the deployment or update. This causes all accumulated Amazon EC2 burst balances to be lost. It happens in the following cases:
-
-Managed platform updates with instance replacement enabled
-Immutable updates
-Deployments with immutable updates or traffic splitting enabled
-Incorrect options:
-
-The deployment was run as a Rolling deployment, resulting in the resetting of EC2 burst balances - With rolling deployments, Elastic Beanstalk splits the environment's Amazon EC2 instances into batches and deploys the new version of the application to one batch at a time. Rolling deployments do not result in loss of EC2 burst balances.
-
-The deployment was run as a All-at-once deployment, flushing all the accumulated EC2 burst balances - The traditional All-at-once deployment, wherein all the instances are updated simultaneously, does not result in loss of EC2 burst balances.
-
-When a canary deployment fails, it resets the EC2 burst balances to zero - This is incorrect and given only as a distractor.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-version-deploy.html
+**❌ Неправильні варіанти:**
+- *Rolling* — оновлює наявні інстанси групами, тож burst credits не втрачаються.
+- *All-at-once* — оновлює наявні інстанси одночасно, credits теж не втрачаються.
+- *Failed canary resets balances* — вигадка.
 
 </details>
 
@@ -780,7 +585,7 @@ https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.rolling-ve
 
 <a id="t11-q47"></a>
 ### T11-Q47
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A developer has been asked to create a web application to be deployed on EC2 instances. The developer just wants to focus on writing application code without worrying about server provisioning, configuration and deployment.
 
@@ -791,27 +596,18 @@ As a Developer Associate, which AWS service would you recommend for the given us
 - ▫️ CloudFormation
 - ✅ Elastic Beanstalk
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Elastic Beanstalk»**
 
-Elastic Beanstalk
+Elastic Beanstalk легко розгортає й запускає застосунки в хмарі та керує їхнім життєвим циклом з одного місця. Ресурси застосунку об'єднані в середовища, і кожне середовище запускає одну версію застосунку. Під час створення середовища Beanstalk сам виділяє всі ресурси, тож про сервери, налаштування й деплой думати не треба.
 
-AWS Elastic Beanstalk provides an environment to easily deploy and run applications in the cloud. It is integrated with developer tools and provides a one-stop experience for you to manage the lifecycle of your applications.
+Переваги: https://aws.amazon.com/elasticbeanstalk/
 
-AWS Elastic Beanstalk lets you manage all of the resources that run your application as environments where each environment runs only a single application version at a time. When an environment is being created, Elastic Beanstalk provisions all the required resources needed to run the application version. You don't need to worry about server provisioning, configuration, and deployment as that's taken care of by Beanstalk.
-
-Benefits of Elastic Beanstalk:  via - https://aws.amazon.com/elasticbeanstalk/
-
-Incorrect options:
-
-CloudFormation - AWS CloudFormation is a service that gives developers and businesses an easy way to create a collection of related AWS and third-party resources and provision them in an orderly and predictable fashion. With CloudFormation, you still need to create a template to specify the type of resources you need, hence this option is not correct.
-
-How CloudFormation Works:  via - https://aws.amazon.com/cloudformation/
-
-CodeDeploy - AWS CodeDeploy is a fully managed deployment service that automates software deployments to a variety of compute services such as Amazon EC2, AWS Fargate, AWS Lambda, and your on-premises servers. AWS CodeDeploy makes it easier for you to rapidly release new features, helps you avoid downtime during application deployment, and handles the complexity of updating your applications. It can deploy an application to an instance but it cannot provision the instance.
-
-Serverless Application Model - The AWS Serverless Application Model (AWS SAM) is an open-source framework for building serverless applications. It provides shorthand syntax to express functions, APIs, databases, and event source mappings. You define the application you want with just a few lines per resource and model it using YAML. As the web application needs to be deployed on EC2 instances, so this option is ruled out.
+**❌ Неправильні варіанти:**
+- *CloudFormation* — створює набори ресурсів, але шаблон доводиться писати самому. Як працює: https://aws.amazon.com/cloudformation/
+- *CodeDeploy* — деплоїть на інстанс, але сам інстанс не створює.
+- *SAM* — для serverless, а тут потрібні EC2.
 
 Джерела: <https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/concepts.html> · <https://aws.amazon.com/cloudformation/>
 
@@ -821,7 +617,7 @@ Serverless Application Model - The AWS Serverless Application Model (AWS SAM) is
 
 <a id="t11-q57"></a>
 ### T11-Q57
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **EB: без додаткових витрат → Rolling.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -834,31 +630,20 @@ Which deployment meets this requirement without incurring additional costs?
 - ✅ Rolling
 - ▫️ Immutable
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Rolling»**
 
-Rolling
+Elastic Beanstalk бере на себе виділення потужностей, балансування, масштабування й моніторинг. Як працює: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html
 
-With Elastic Beanstalk, you can quickly deploy and manage applications in the AWS Cloud without having to learn about the infrastructure that runs those applications. Elastic Beanstalk reduces management complexity without restricting choice or control. You simply upload your application, and Elastic Beanstalk automatically handles the details of capacity provisioning, load balancing, scaling, and application health monitoring.
+**Rolling** деплоїть нову версію групами інстансів. Кожна група на час деплою виводиться з обслуговування, тож потужність падає на розмір групи. Вартість не змінюється, бо нових інстансів немає. Без простою, але деплой довший.
 
-How Elastic BeanStalk Works:  via - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html
+Огляд політик: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
 
-The rolling deployment policy deploys the new version in batches. Each batch is taken out of service during the deployment phase, reducing your environment's capacity by the number of instances in a batch. The cost remains the same as the number of EC2 instances does not increase. This policy avoids downtime and minimizes reduced availability, at a cost of a longer deployment time.
-
-Overview of Elastic Beanstalk Deployment Policies:  via - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
-
-Incorrect options:
-
-Immutable - The 'Immutable' deployment policy ensures that your new application version is always deployed to new instances, instead of updating existing instances. It also has the additional advantage of a quick and safe rollback in case the deployment fails.
-
-All at once - This policy deploys the new version to all instances simultaneously. Although 'All at once' is the quickest deployment method, but the application may become unavailable to users (or have low availability) for a short time.
-
-Rolling with additional batches - This policy deploys the new version in batches, but first launches a new batch of instances to ensure full capacity during the deployment process. This policy avoids any reduced availability, at a cost of an even longer deployment time compared to the Rolling method. Suitable if you must maintain the same bandwidth throughout the deployment. These increase the costs as you're adding extra instances during the deployment.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
+**❌ Неправильні варіанти:**
+- *Immutable* — нові інстанси в новій ASG, тож дорожче.
+- *All at once* — можливий простій.
+- *Rolling with additional batch* — додаткові інстанси, тож дорожче.
 
 </details>
 
@@ -866,7 +651,7 @@ https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-exi
 
 <a id="t12-q19"></a>
 ### T12-Q19
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **EB: Blue/Green.** → [детальніше](../../06-contradictions-and-traps.md#c07)
 
@@ -879,27 +664,18 @@ As a Developer Associate, which of the following options would you recommend to 
 - ▫️ Deploy the new application version using 'Rolling with additional batch' deployment policy
 - ✅ Deploy the new version to a separate environment via Blue/Green Deployment, and then swap Route 53 records of the two environments to redirect traffic to the new version
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Deploy the new version to a separate environment via Blue/Green Deployment, and then swap Route 53 records of the two environments to redirect traffic to the new version»**
 
-Deploy the new version to a separate environment via Blue/Green Deployment, and then swap Route 53 records of the two environments to redirect traffic to the new version
+З політиками на зразок All at once Elastic Beanstalk оновлює наявні інстанси in-place, і застосунок може ненадовго стати недоступним. Blue/green-деплой цього уникає: нову версію розгортають в окремому середовищі, а потім міняють CNAME середовищ, і трафік миттєво переходить на нову версію. Відкат — такий самий швидкий swap назад.
 
-With deployment policies such as 'All at once', AWS Elastic Beanstalk performs an in-place update when you update your application versions and your application can become unavailable to users for a short period of time. You can avoid this downtime by performing a blue/green deployment, where you deploy the new version to a separate environment, and then swap CNAMEs (via Route 53) of the two environments to redirect traffic to the new version instantly. In case of any deployment issues, the rollback process is very quick via swapping the URLs for the two environments.
+Огляд політик: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
 
-Overview of Elastic Beanstalk Deployment Policies:  via - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
-
-Incorrect options:
-
-Deploy the new application version using 'All at once' deployment policy - Although 'All at once' is the quickest deployment method, but the application may become unavailable to users (or have low availability) for a short time. So this option is not correct.
-
-Deploy the new application version using 'Rolling' deployment policy - This policy avoids downtime and minimizes reduced availability, at a cost of a longer deployment time. However rollback process is via manual redeploy, so it's not as quick as the Blue/Green deployment.
-
-Deploy the new application version using 'Rolling with additional batch' deployment policy - This policy avoids any reduced availability, at a cost of an even longer deployment time compared to the Rolling method. Suitable if you must maintain the same bandwidth throughout the deployment. However rollback process is via manual redeploy, so it's not as quick as the Blue/Green deployment.
-
-Reference:
-
-https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html
+**❌ Неправильні варіанти:**
+- *All at once* — можливий короткий простій.
+- *Rolling* — без простою, але відкат — ручним повторним деплоєм.
+- *Rolling with additional batch* — повна потужність, але відкат теж ручним повторним деплоєм.
 
 </details>
 

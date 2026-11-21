@@ -3,11 +3,11 @@
 **Домен 1 — Розробка з використанням сервісів AWS** · питань: 7  
 Теорія: [01-domain1-development.md](../../01-domain1-development.md#stepfn) · [Протиріччя](../../06-contradictions-and-traps.md) · [Застарілі/сумнівні відповіді](../../07-outdated-and-wrong-answers.md) · [Усі розділи](../README.md)
 
-> Тексти питань і пояснення — оригінальні англійською (на екзамені теж англійська). ✅ — правильна відповідь за ключем банку, ❌ — твоя минула помилкова відповідь. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
+> Тексти питань і варіантів — англійською (як на екзамені), пояснення — українською. ✅ — правильна відповідь за ключем банку. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
 
 <a id="t04-q40"></a>
 ### T04-Q40
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Application Integration)*
+*домен: визначено автоматично (у джерелі: AWS Application Integration)*
 
 A legacy application is being refactored into a microservices architecture running on AWS. The microservice will include several AWS Lambda functions. A Developer will use AWS Step Functions to coordinate function execution.
 
@@ -18,27 +18,21 @@ How should the Developer proceed?
 - ✅ Create a state machine using the Amazon States Language
 - ▫️ Create a workflow using the StartExecution API action
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Step Functions is a web service that enables you to coordinate the components of distributed applications and microservices using visual workflows. You build applications from individual components that each perform a discrete function, or task, allowing you to scale and change applications quickly.
+**✅ Правильна відповідь: «Create a state machine using the Amazon States Language»**
 
-The following are key features of AWS Step Functions:
+AWS Step Functions координує компоненти розподілених застосунків і мікросервісів візуальними workflow. Основне:
+- побудований на задачах (tasks) і state machines;
+- state machine описують мовою **Amazon States Language** (JSON);
+- консоль показує граф state machine для перевірки логіки й моніторингу виконань.
 
-• Step Functions is based on the concepts of tasks and state machines.
+Щоб координувати Lambda-функції, треба створити state machine на ASL.
 
-• You define state machines using the JSON-based Amazon States Language.
-
-• The Step Functions console displays a graphical view of your state machine's structure. This provides a way to visually check your state machine's logic and monitor executions.
-
-The Developer needs to create a state machine using the Amazon States Language as this is how you can create an executable state machine that includes the Lambda functions that must be coordinated.
-
-CORRECT: "Create a state machine using the Amazon States Language" is the correct answer.
-
-INCORRECT: "Create an AWS CloudFormation stack using a YAML-formatted template" is incorrect as AWS Step Functions does not use CloudFormation. The Developer needs to create a state machine.
-
-INCORRECT: "Create a workflow using the StartExecution API action" is incorrect as workflows are associated with Amazon SWF whereas the StartExecution API action is a Step Functions action for executing a state machine.
-
-INCORRECT: "Create a layer in AWS Lambda and add the functions to the layer" is incorrect as a layer is a ZIP archive that contains libraries, a custom runtime, or other dependencies that you can use to pull additional code into a Lambda function.
+**❌ Неправильні варіанти:**
+- *CloudFormation stack (YAML)* — Step Functions не вимагає CloudFormation; потрібна саме state machine.
+- *Workflow using the StartExecution API* — «workflow» — поняття SWF, а `StartExecution` лише запускає вже створену state machine.
+- *Lambda layer with the functions* — layer — ZIP з бібліотеками чи runtime, а не засіб оркестрації.
 
 Джерела: <https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html>
 
@@ -48,7 +42,7 @@ INCORRECT: "Create a layer in AWS Lambda and add the functions to the layer" is 
 
 <a id="t07-q25"></a>
 ### T07-Q25
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A team is checking the viability of using AWS Step Functions for creating a banking workflow for loan approvals. The web application will also have human approval as one of the steps in the workflow.
 
@@ -60,27 +54,18 @@ As a developer associate, which of the following would you identify as the key c
 - ▫️ Both Standard and Express Workflows support all service integrations, activities, and design patterns
 - ▫️ Standard Workflows on AWS Step Functions are suitable for long-running, durable, and auditable workflows that do not support any human approval steps
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct options:
+**✅ Правильна відповідь: «You should use Express Workflows for workloads with high event rates and short duration» + «Standard Workflows on AWS Step Functions are suitable for long-running, durable, and auditable workflows that can also support any human approval steps»**
 
-Standard Workflows on AWS Step Functions are suitable for long-running, durable, and auditable workflows that can also support any human approval steps - Standard Workflows on AWS Step Functions are more suitable for long-running, durable, and auditable workflows where repeating workflow steps is expensive (e.g., restarting a long-running media transcode) or harmful (e.g., charging a credit card twice). Example workloads include training and deploying machine learning models, report generation, billing, credit card processing, and ordering and fulfillment processes. Step functions also support any human approval steps.
+**Standard Workflows** підходять для довгих, надійних і аудитованих процесів, де повторити крок дорого (перезапуск довгого транскодування) або шкідливо (повторне списання з картки). Приклади: навчання й деплой ML-моделей, звіти, білінг, обробка платежів, замовлення. Підтримують кроки з ручним схваленням.
 
-You should use Express Workflows for workloads with high event rates and short duration\* - You should use Express Workflows for workloads with high event rates and short durations. Express Workflows support event rates of more than 100,000 per second.
+**Express Workflows** — для великої кількості подій і коротких виконань: понад 100 000 подій на секунду.
 
-Incorrect options:
-
-Standard Workflows on AWS Step Functions are suitable for long-running, durable, and auditable workflows that do not support any human approval steps - As Step functions support any human approval steps, so this option is incorrect.
-
-Express Workflows have a maximum duration of five minutes and Standard workflows have a maximum duration of 180 days or 6 months - Express Workflows have a maximum duration of five minutes and Standard workflows have a maximum duration of one year.
-
-Both Standard and Express Workflows support all service integrations, activities, and design patterns - Standard Workflows support all service integrations, activities, and design patterns. Express Workflows do not support activities, job-run (.sync), and Callback patterns.
-
-Reference:
-
-https://aws.amazon.com/step-functions/features/
-
-https://aws.amazon.com/blogs/compute/implementing-serverless-manual-approval-steps-in-aws-step-functions-and-amazon-api-gateway/
+**❌ Неправильні варіанти:**
+- *Standard does not support human approval* — підтримує, через callback із task token.
+- *Express 5 min, Standard 180 days / 6 months* — Express справді до 5 хвилин, але Standard — до **1 року**.
+- *Both support all integrations and patterns* — Express не підтримує activities, `.sync` (job-run) і callback (`.waitForTaskToken`).
 
 </details>
 
@@ -88,7 +73,7 @@ https://aws.amazon.com/blogs/compute/implementing-serverless-manual-approval-ste
 
 <a id="t07-q44"></a>
 ### T07-Q44
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A company wants to automate and orchestrate a multi-source high-volume flow of data in a scalable data management solution built using AWS services. The solution must ensure that the business rules and transformations run in sequence, handle reprocessing of data in case of errors, and require minimal maintenance.
 
@@ -99,23 +84,16 @@ Which AWS service should the company use to manage and automate the orchestratio
 - ▫️ Amazon Kinesis Data Streams
 - ▫️ AWS Batch
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «AWS Step Functions»**
 
-AWS Step Functions
+Step Functions — сервіс візуальних workflows. З ним будують розподілені застосунки з сервісів AWS, автоматизують процеси, оркеструють мікросервіси і створюють пайплайни даних та ML.
 
-AWS Step Functions is a visual workflow service that helps developers use AWS services to build distributed applications, automate processes, orchestrate microservices, and create data and machine learning (ML) pipelines.
-
- via - https://aws.amazon.com/step-functions/
-
-Incorrect options:
-
-Amazon Kinesis Data Streams - Amazon Kinesis Data Streams is a serverless streaming data service that makes it easy to capture, process, and store data streams at any scale.
-
-AWS Glue - AWS Glue is a serverless data integration service that makes it easier to discover, prepare, move, and integrate data from multiple sources for analytics, machine learning (ML), and application development.
-
-AWS Batch - AWS Batch is a set of batch management capabilities that enables developers, scientists, and engineers to easily and efficiently run hundreds of thousands of batch computing jobs on AWS. AWS Batch dynamically provisions the optimal quantity and type of compute resources (e.g., CPU or memory optimized compute resources) based on the volume and specific resource requirements of the batch jobs submitted.
+**❌ Неправильні варіанти:**
+- *Kinesis Data Streams* — serverless-сервіс для збору, обробки й зберігання потоків даних; не оркеструє.
+- *AWS Glue* — serverless-інтеграція даних (ETL) для аналітики й ML; не оркеструє.
+- *AWS Batch* — пакетні обчислення з автоматичним підбором ресурсів; не оркеструє.
 
 Джерела: <https://aws.amazon.com/step-functions/> · <https://aws.amazon.com/kinesis/data-streams/> · <https://aws.amazon.com/glue/> · <https://aws.amazon.com/batch/faqs/>
 
@@ -125,7 +103,7 @@ AWS Batch - AWS Batch is a set of batch management capabilities that enables dev
 
 <a id="t09-q27"></a>
 ### T09-Q27
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A company wants to automate its order fulfillment and inventory tracking workflow. Starting from order creation to updating inventory to shipment, the entire process has to be tracked, managed and updated automatically.
 
@@ -136,33 +114,23 @@ Which of the following would you recommend as the most optimal solution for this
 - ▫️ Use Amazon SNS to develop event-driven applications that can share information
 - ▫️ Configure Amazon EventBridge to track the flow of work from order management to inventory tracking systems
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Use AWS Step Functions to coordinate and manage the components of order management and inventory tracking workflow»**
 
-Use AWS Step Functions to coordinate and manage the components of order management and inventory tracking workflow
+Step Functions — serverless-оркестратор, який вибудовує Lambda-функції та сервіси AWS у бізнес-процеси. Через візуальний інтерфейс створюють workflows з контрольними точками, що зберігають стан. Вихід одного кроку стає входом наступного, і кроки виконуються в порядку бізнес-логіки. Крок може викликати Lambda чи контейнер, оновити DynamoDB або надіслати повідомлення в чергу.
 
-AWS Step Functions is a serverless function orchestrator that makes it easy to sequence AWS Lambda functions and multiple AWS services into business-critical applications. Through its visual interface, you can create and run a series of checkpointed and event-driven workflows that maintain the application state. The output of one step acts as an input to the next. Each step in your application executes in order, as defined by your business logic.
+Переваги:
+- **Швидка розробка** — бізнес-вимоги перетворюються на візуальні workflows, компоненти легко міняти місцями.
+- **Стійкість** — стан, контрольні точки й перезапуски керуються автоматично; є вбудовані try/catch, retry і rollback.
+- **Менше коду** — розгалуження, паралельність і timeouts вбудовані.
 
-AWS Step Functions enables you to implement a business process as a series of steps that make up a workflow. The individual steps in the workflow can invoke a Lambda function or a container that has some business logic, update a database such as DynamoDB or publish a message to a queue once that step or the entire workflow completes execution.
+Як працює: https://aws.amazon.com/step-functions/
 
-Benefits of Step Functions:
-
-Build and update apps quickly: AWS Step Functions lets you build visual workflows that enable the fast translation of business requirements into technical requirements. You can build applications in a matter of minutes, and when needs change, you can swap or reorganize components without customizing any code.
-
-Improve resiliency: AWS Step Functions manages state, checkpoints and restarts for you to make sure that your application executes in order and as expected. Built-in try/catch, retry and rollback capabilities deal with errors and exceptions automatically.
-
-Write less code: AWS Step Functions manages the logic of your application for you and implements basic primitives such as branching, parallel execution, and timeouts. This removes extra code that may be repeated in your microservices and functions.
-
-How Step Functions work:  via - https://aws.amazon.com/step-functions/
-
-Incorrect options:
-
-Use Amazon Simple Queue Service (Amazon SQS) queue to pass information from order management to inventory tracking workflow - You should consider AWS Step Functions when you need to coordinate service components in the development of highly scalable and auditable applications. You should consider using Amazon Simple Queue Service (Amazon SQS), when you need a reliable, highly scalable, hosted queue for sending, storing, and receiving messages between services. Step Functions keeps track of all tasks and events in an application. Amazon SQS requires you to implement your own application-level tracking, especially if your application uses multiple queues.
-
-Configure Amazon EventBridge to track the flow of work from order management to inventory tracking systems - Both Amazon EventBridge and Amazon SNS can be used to develop event-driven applications, and your choice will depend on your specific needs. Amazon EventBridge is recommended when you want to build an application that reacts to events from SaaS applications and/or AWS services. Amazon EventBridge is the only event-based service that integrates directly with third-party SaaS partners.
-
-Use Amazon SNS to develop event-driven applications that can share information - Amazon SNS is recommended when you want to build an application that reacts to high throughput or low latency messages published by other applications or microservices (as Amazon SNS provides nearly unlimited throughput), or for applications that need very high fan-out (thousands or millions of endpoints).
+**❌ Неправильні варіанти:**
+- *SQS* — надійна черга для обміну повідомленнями, але відстеження стану workflow доведеться писати самим. Step Functions сам відстежує всі задачі й події.
+- *EventBridge* — для застосунків, що реагують на події SaaS і сервісів AWS; єдиний подієвий сервіс з прямою інтеграцією із SaaS-партнерами. Але workflows не оркеструє.
+- *SNS* — для високої пропускної здатності й fan-out на тисячі чи мільйони endpoints, а не для оркестрації.
 
 Джерела: <https://aws.amazon.com/step-functions/faqs/> · <https://aws.amazon.com/eventbridge/faqs/>
 
@@ -172,7 +140,7 @@ Use Amazon SNS to develop event-driven applications that can share information -
 
 <a id="t09-q38"></a>
 ### T09-Q38
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 While defining a business workflow as state machine on AWS Step Functions, a developer has configured several states.
 
@@ -220,49 +188,24 @@ Which of the following would you identify as the state that represents a single 
   }
   ```
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
-
+**✅ Правильна відповідь:**
+```json
 "HelloWorld": {
   "Type": "Task",
   "Resource": "arn:aws:lambda:us-east-1:123456789012:function:HelloFunction",
   "Next": "AfterHelloWorldState",
   "Comment": "Run the HelloWorld Lambda function"
 }
-A Task state ("Type": "Task") represents a single unit of work performed by a state machine.
+```
 
-All work in your state machine is done by tasks. A task performs work by using an activity or an AWS Lambda function, or by passing parameters to the API actions of other services.
+Стан Task (`"Type": "Task"`) — одна одиниця роботи state machine. Усю роботу в state machine виконують задачі: через activity, Lambda-функцію або виклик API інших сервісів. Step Functions може викликати Lambda напряму з Task-стану.
 
-AWS Step Functions can invoke Lambda functions directly from a task state. A Lambda function is a cloud-native task that runs on AWS Lambda. You can write Lambda functions in a variety of programming languages, using the AWS Management Console or by uploading code to Lambda.
-
-Incorrect options:
-
-"wait_until" : {
-  "Type": "Wait",
-  "Timestamp": "2016-03-14T01:59:00Z",
-  "Next": "NextState"
-}
-A Wait state ("Type": "Wait") delays the state machine from continuing for a specified time.
-"No-op": {
-  "Type": "Task",
-  "Result": {
-    "x-datum": 0.381018,
-    "y-datum": 622.2269926397355
-  },
-  "ResultPath": "$.coords",
-  "Next": "End"
-}
-Resource field is a required parameter for Task state. This definition is not of a Task but of type Pass.
-"FailState": {
-  "Type": "Fail",
-  "Cause": "Invalid response.",
-  "Error": "ErrorA"
-}
-A Fail state ("Type": "Fail") stops the execution of the state machine and marks it as a failure unless it is caught by a Catch block. Because Fail states always exit the state machine, they have no Next field and don't require an End field.
-Reference:
-
-https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-task-state.html
+**❌ Неправильні варіанти:**
+- *`"Type": "Wait"`* — стан Wait лише затримує виконання до заданого часу.
+- *`"No-op"` з `Result`* — у Task обов'язкове поле `Resource`; без нього це по суті стан Pass.
+- *`"Type": "Fail"`* — зупиняє виконання з помилкою, якщо її не перехопить Catch. Не має `Next`, і `End` йому не потрібен.
 
 </details>
 
@@ -270,7 +213,7 @@ https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-task
 
 <a id="t10-q18"></a>
 ### T10-Q18
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Application Integration)*
+*домен: визначено автоматично (у джерелі: AWS Application Integration)*
 
 An IT automation architecture uses many AWS Lambda functions invoking one another as a large state machine. The coordination of this state machine is legacy custom code that breaks easily.
 Which AWS Service can help refactor and manage the state machine?
@@ -280,23 +223,18 @@ Which AWS Service can help refactor and manage the state machine?
 - ▫️ AWS CodePipeline
 - ✅ AWS Step Functions
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Step Functions lets you coordinate multiple AWS services into serverless workflows so you can build and update apps quickly. Using Step Functions, you can design and run workflows that stitch together services, such as AWS Lambda, AWS Fargate, and Amazon SageMaker, into feature-rich applications.
+**✅ Правильна відповідь: «AWS Step Functions»**
 
-Workflows are made up of a series of steps, with the output of one step acting as input into the next. Application development is simpler and more intuitive using Step Functions, because it translates your workflow into a state machine diagram that is easy to understand, easy to explain to others, and easy to change.
+Step Functions поєднує сервіси AWS (Lambda, Fargate, SageMaker тощо) у serverless-workflows. Workflow складається з кроків, і вихід одного стає входом наступного. Його видно як діаграму state machine, яку легко зрозуміти, пояснити й змінити.
 
-Step Functions automatically triggers and tracks each step, and retries when there are errors, so your application executes in order and as expected. With Step Functions, you can craft long-running workflows such as machine learning model training, report generation, and IT automation.
+Step Functions сам запускає й відстежує кожен крок і повторює його при помилках, тож застосунок виконується в правильному порядку. Підходить і для довгих процесів: навчання ML-моделей, звітів, ІТ-автоматизації. Тож це найкращий вибір для рефакторингу legacy-коду.
 
-Therefore, AWS Step Functions is the best AWS service to use when refactoring the application away from the legacy code.
-
-CORRECT: "AWS Step Functions" is the correct answer.
-
-INCORRECT: "AWS CloudFormation" is incorrect as CloudFormation is used for deploying resources no AWS but not for ongoing automation.
-
-INCORRECT: "AWS CodePipeline" is incorrect as this is used as part of a continuous integration and delivery (CI/CD) pipeline to deploy software updates to applications.
-
-INCORRECT: "AWS CodeBuild" is incorrect as this an AWS build/test service.
+**❌ Неправильні варіанти:**
+- *CloudFormation* — розгортає ресурси, але не автоматизує поточні процеси.
+- *CodePipeline* — CI/CD для оновлень застосунку.
+- *CodeBuild* — збирання й тестування.
 
 Джерела: <https://aws.amazon.com/step-functions/>
 
@@ -306,7 +244,7 @@ INCORRECT: "AWS CodeBuild" is incorrect as this an AWS build/test service.
 
 <a id="t10-q40"></a>
 ### T10-Q40
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Application Integration)*
+*домен: визначено автоматично (у джерелі: AWS Application Integration)*
 
 A company currently runs a number of legacy automated batch processes for system update management and operational activities. The company are looking to refactor these processes and require a service that can coordinate multiple AWS services into serverless workflows.
 
@@ -317,19 +255,20 @@ What is the MOST suitable service for this requirement?
 - ▫️ AWS Lambda
 - ✅ AWS Step Functions
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Step Functions is a web service that enables you to coordinate the components of distributed applications and microservices using visual workflows. You build applications from individual components that each perform a discrete function, or task, allowing you to scale and change applications quickly.
+**✅ Правильна відповідь: «AWS Step Functions»**
 
-Step Functions provides a reliable way to coordinate components and step through the functions of your application. Step Functions offers a graphical console to visualize the components of your application as a series of steps. It automatically triggers and tracks each step, and retries when there are errors, so your application executes in order and as expected, every time. Step Functions logs the state of each step, so when things go wrong, you can diagnose and debug problems quickly.
+Step Functions координує компоненти розподілених застосунків і мікросервісів через візуальні workflows. Що він робить:
+- застосунок складається з окремих компонентів-задач, тож його легко масштабувати й змінювати;
+- графічна консоль показує компоненти як послідовність кроків;
+- кожен крок запускається і відстежується автоматично, з повторами при помилках;
+- стан кожного кроку логується, тож проблеми швидко діагностуються.
 
-CORRECT: "AWS Step Functions" is the correct answer.
-
-INCORRECT: "Amazon SWF" is incorrect. You can think of Amazon SWF as a fully-managed state tracker and task coordinator in the Cloud. It does not coordinate serverless workflows.
-
-INCORRECT: "AWS Batch" is incorrect as this is used to run batch computing jobs on Amazon EC2 and is therefore not serverless.
-
-INCORRECT: "AWS Lambda" is incorrect as though it is serverless, it does not provide a native capability to coordinate multiple AWS services.
+**❌ Неправильні варіанти:**
+- *Amazon SWF* — керований трекер стану і координатор задач, але не для serverless-workflows.
+- *AWS Batch* — пакетні обчислення на EC2, не serverless.
+- *AWS Lambda* — serverless, але не координує кілька сервісів.
 
 Джерела: <https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html>
 

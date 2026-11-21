@@ -3,11 +3,11 @@
 **Домен 1 — Розробка з використанням сервісів AWS** · питань: 16  
 Теорія: [03-domain3-deployment.md](../../03-domain3-deployment.md#containers) · [Протиріччя](../../06-contradictions-and-traps.md) · [Застарілі/сумнівні відповіді](../../07-outdated-and-wrong-answers.md) · [Усі розділи](../README.md)
 
-> Тексти питань і пояснення — оригінальні англійською (на екзамені теж англійська). ✅ — правильна відповідь за ключем банку, ❌ — твоя минула помилкова відповідь. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
+> Тексти питань і варіантів — англійською (як на екзамені), пояснення — українською. ✅ — правильна відповідь за ключем банку. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
 
 <a id="t02-q19"></a>
 ### T02-Q19
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 ```json
 A Developer has created a task definition that includes the following JSON code:
@@ -29,33 +29,21 @@ What is the effect of this task placement strategy?
 - ▫️ It distributes tasks evenly across Availability Zones and then bin packs tasks based on memory within each Availability Zone
 - ▫️ It distributes tasks evenly across Availability Zones and then distributes tasks randomly across instances within each Availability Zone
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-A task placement strategy is an algorithm for selecting instances for task placement or tasks for termination. Task placement strategies can be specified when either running a task or creating a new service.
+**✅ Правильна відповідь: «It distributes tasks evenly across Availability Zones and then distributes tasks evenly across the instances within each Availability Zone»**
 
-Amazon ECS supports the following task placement strategies:
+Task placement strategy — алгоритм вибору інстансів для розміщення задач (або задач для термінації). Задається при запуску задачі чи створенні сервісу (`CreateService`, `UpdateService`, `RunTask`). Стратегії ECS:
+- **binpack** — розміщує за найменшим залишком CPU або пам'яті, мінімізує кількість інстансів;
+- **random** — випадково;
+- **spread** — рівномірно за вказаним значенням: `instanceId` (або `host`) чи атрибутом інстансу, наприклад `attribute:ecs.availability-zone`.
 
-binpack
+Стратегії можна комбінувати: тут спершу spread по AZ, потім spread по інстансах усередині AZ.
 
-Place tasks based on the least available amount of CPU or memory. This minimizes the number of instances in use.
-
-random
-
-Place tasks randomly.
-
-spread
-
-Place tasks evenly based on the specified value. Accepted values are instanceId (or host, which has the same effect), or any platform or custom attribute that is applied to a container instance, such as attribute:ecs.availability-zone.
-
-You can specify task placement strategies with the following actions: CreateService, UpdateService, and RunTask. You can also use multiple strategies together as in the example JSON code provided with the question.
-
-CORRECT: "It distributes tasks evenly across Availability Zones and then distributes tasks evenly across the instances within each Availability Zone" is the correct answer.
-
-INCORRECT: "It distributes tasks evenly across Availability Zones and then bin packs tasks based on memory within each Availability Zone" is incorrect as it does not use the binpack strategy.
-
-INCORRECT: "It distributes tasks evenly across Availability Zones and then distributes tasks evenly across distinct instances within each Availability Zone" is incorrect as it does not spread tasks across distinct instances (use a task placement constraint).
-
-INCORRECT: "It distributes tasks evenly across Availability Zones and then distributes tasks randomly across instances within each Availability Zone" is incorrect as it does not use the random strategy.
+**❌ Неправильні варіанти:**
+- *…then bin packs tasks based on memory* — binpack тут не використовується.
+- *…across distinct instances* — гарантію «окремий інстанс для кожної задачі» дає placement constraint `distinctInstance`, а не стратегія.
+- *…randomly across instances* — random тут не використовується.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html>
 
@@ -65,7 +53,7 @@ INCORRECT: "It distributes tasks evenly across Availability Zones and then distr
 
 <a id="t02-q22"></a>
 ### T02-Q22
-*✅ відповів правильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A company runs many microservices applications that use Docker containers. The company are planning to migrate the containers to Amazon ECS. The workloads are highly variable and therefore the company prefers to be charged per running task.
 
@@ -76,19 +64,15 @@ Which solution is the BEST fit for the company’s requirements?
 - ✅ Amazon ECS with the Fargate launch type
 - ▫️ An Amazon ECS Service with Auto Scaling
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-The key requirement is that the company should be charged per running task. Therefore, the best answer is to use Amazon ECS with the Fargate launch type as with this model AWS charge you for running tasks rather than running container instances.
+**✅ Правильна відповідь: «Amazon ECS with the Fargate launch type»**
 
-The Fargate launch type allows you to run your containerized applications without the need to provision and manage the backend infrastructure. You just register your task definition and Fargate launches the container for you. The Fargate Launch Type is a serverless infrastructure managed by AWS.
+Ключова вимога — платити за запущені задачі. На Fargate AWS бере плату саме за задачі, а не за container instances. Fargate запускає контейнери без провізіонінгу й керування інфраструктурою: реєструєш task definition, і Fargate сам запускає контейнер. Це serverless-модель під керуванням AWS.
 
-CORRECT: "Amazon ECS with the Fargate launch type" is the correct answer.
-
-INCORRECT: "Amazon ECS with the EC2 launch type" is incorrect as with this launch type you pay for running container instances (EC2 instances).
-
-INCORRECT: "An Amazon ECS Service with Auto Scaling" is incorrect as this does not specify the launch type. You can run an ECS Service on the Fargate or EC2 launch types.
-
-INCORRECT: "An Amazon ECS Cluster with Auto Scaling" is incorrect as this does not specify the launch type. You can run an ECS Cluster on the Fargate or EC2 launch types.
+**❌ Неправильні варіанти:**
+- *ECS with the EC2 launch type* — платиш за запущені EC2-інстанси.
+- *ECS Service with Auto Scaling* і *ECS Cluster with Auto Scaling* — не вказано launch type: сервіс і кластер можуть працювати і на Fargate, і на EC2.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html>
 
@@ -98,7 +82,7 @@ INCORRECT: "An Amazon ECS Cluster with Auto Scaling" is incorrect as this does n
 
 <a id="t02-q23"></a>
 ### T02-Q23
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A Developer will be launching several Docker containers on a new Amazon ECS cluster using the EC2 Launch Type. The containers will all run a web service on port 80.
 
@@ -106,22 +90,21 @@ What is the EASIEST way the Developer can configure the task definition to ensur
 
 - ✅ Specify port 80 for the container port and port 0 for the host port
 - ▫️ Leave both the container port and host port configuration blank
-- ❌ Specify port 80 for the container port and a unique port number for the host port
+- ▫️ Specify port 80 for the container port and a unique port number for the host port
 - ▫️ Specify a unique port number for the container port and port 80 for the host port
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Port mappings allow containers to access ports on the host container instance to send or receive traffic. Port mappings are specified as part of the container definition. The container port is the port number on the container that is bound to the user-specified or automatically assigned host port. The host port is the port number on the container instance to reserve for your container.
+**✅ Правильна відповідь: «Specify port 80 for the container port and port 0 for the host port»**
 
-As we cannot have multiple services bound to the same host port, we need to ensure that each container port mapping uses a different host port. The easiest way to do this is to set the host port number to 0 and ECS will automatically assign an available port. We also need to assign port 80 to the container port so that the web service is able to run.
+Port mappings у container definition дають контейнерам доступ до портів хоста. Container port — порт усередині контейнера; host port — порт на інстансі, зарезервований для контейнера (заданий або призначений автоматично).
 
-CORRECT: "Specify port 80 for the container port and port 0 for the host port" is the correct answer.
+Кілька контейнерів не можуть займати один host port, тож кожному потрібен інший. Найпростіше задати host port = 0: ECS сам призначить вільний порт (dynamic port mapping). А container port має бути 80, бо на ньому працює веб-сервіс.
 
-INCORRECT: "Specify port 80 for the container port and a unique port number for the host port" is incorrect as this is more difficult to manage as you have to manually assign the port number.
-
-INCORRECT: "Specify a unique port number for the container port and port 80 for the host port" is incorrect as the web service on the container needs to run on pot 80 and you can only bind one container to port 80 on the host so this would not allow more than one container to work.
-
-INCORRECT: "Leave both the container port and host port configuration blank" is incorrect as this would mean that ECS would dynamically assign both the container and host port. As the web service must run on port 80 this would not work correctly.
+**❌ Неправильні варіанти:**
+- *Container 80, unique host port* — доводиться вручну призначати порти, складніше керувати.
+- *Unique container port, host port 80* — сервіс має слухати 80 у контейнері, а на порт 80 хоста можна прив'язати лише один контейнер.
+- *Leave both blank* — ECS призначить обидва порти динамічно, і сервіс не працюватиме на 80.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PortMapping.html>
 
@@ -131,36 +114,30 @@ INCORRECT: "Leave both the container port and host port configuration blank" is 
 
 <a id="t02-q30"></a>
 ### T02-Q30
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A Developer is deploying an application in a microservices architecture on Amazon ECS. The Developer needs to choose the best task placement strategy to MINIMIZE the number of instances that are used. Which task placement strategy should be used?
 
 - ▫️ weighted
 - ✅ binpack
-- ❌ spread
+- ▫️ spread
 - ▫️ random
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-A task placement strategy is an algorithm for selecting instances for task placement or tasks for termination. Task placement strategies can be specified when either running a task or creating a new service.
+**✅ Правильна відповідь: «binpack»**
 
-Amazon ECS supports the following task placement strategies:
+Стратегії розміщення задач ECS:
+- **binpack** — розміщує за найменшим залишком CPU або пам'яті, мінімізуючи кількість інстансів;
+- **random** — випадково;
+- **spread** — рівномірно за значенням (`instanceId`/`host` або атрибут на кшталт `attribute:ecs.availability-zone`). Задачі сервісу розподіляються відносно задач цього сервісу, окремі задачі — відносно задач тієї ж task group.
 
-binpack - Place tasks based on the least available amount of CPU or memory. This minimizes the number of instances in use.
+Мінімізувати кількість інстансів — це binpack.
 
-random - Place tasks randomly.
-
-spread - Place tasks evenly based on the specified value. Accepted values are instanceId (or host, which has the same effect), or any platform or custom attribute that is applied to a container instance, such as attribute:ecs.availability-zone. Service tasks are spread based on the tasks from that service. Standalone tasks are spread based on the tasks from the same task group.
-
-The binpack task placement strategy is the most suitable for this scenario as it minimizes the number of instances used which is a requirement for this solution.
-
-CORRECT: "binpack" is the correct answer.
-
-INCORRECT: "random" is incorrect as this would assign tasks randomly to EC2 instances which would not result in minimizing the number of instances used.
-
-INCORRECT: "spread" is incorrect as this would spread the tasks based on a specified value. This is not used for minimizing the number of instances used.
-
-INCORRECT: "weighted" is incorrect as this is not an ECS task placement strategy. Weighted is associated with Amazon Route 53 routing policies.
+**❌ Неправильні варіанти:**
+- *random* — не мінімізує кількість інстансів.
+- *spread* — розподіляє рівномірно, а не ущільнює.
+- *weighted* — не стратегія ECS (це політика маршрутизації Route 53).
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html>
 
@@ -170,7 +147,7 @@ INCORRECT: "weighted" is incorrect as this is not an ECS task placement strategy
 
 <a id="t02-q49"></a>
 ### T02-Q49
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A company is deploying a microservices application on AWS Fargate using Amazon ECS. The application has environment variables that must be passed to a container for the application to initialize.
 
@@ -179,27 +156,18 @@ How should the environment variables be passed to the container?
 - ▫️ Use advanced container definition parameters and define environment variables under the environment parameter within the service definition.
 - ▫️ Use standard container definition parameters and define environment variables under the WorkingDirectory parameter within the service definition.
 - ✅ Use advanced container definition parameters and define environment variables under the environment parameter within the task definition.
-- ❌ Use standard container definition parameters and define environment variables under the secrets parameter within the task definition.
+- ▫️ Use standard container definition parameters and define environment variables under the secrets parameter within the task definition.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-When you register a task definition, you must specify a list of container definitions that are passed to the Docker daemon on a container instance.
+**✅ Правильна відповідь: «Use advanced container definition parameters and define environment variables under the environment parameter within the task definition»**
 
-The developer should use advanced container definition parameters and define environment variables to pass to the container.
+При реєстрації task definition задають список container definitions, які передаються Docker daemon на інстансі. Змінні середовища передають через параметр `environment` (з розширених параметрів container definition) саме в **task definition**.
 
-CORRECT: "Use advanced container definition parameters and define environment variables under the environment parameter within the task definition" is the correct answer (as explained above.)
-
-INCORRECT: "Use advanced container definition parameters and define environment variables under the environment parameter within the service definition" is incorrect.
-
-The task definition is the correct place to define the environment variables to pass to the container.
-
-INCORRECT: "Use standard container definition parameters and define environment variables under the secrets parameter within the task definition" is incorrect.
-
-Advanced container definition parameters must be used to pass the environment variables to the container. The environment parameter should also be used.
-
-INCORRECT: "Use standard container definition parameters and define environment variables under the WorkingDirectory parameter within the service definition" is incorrect.
-
-Advanced container definition parameters must be used to pass the environment variables to the container. The environment parameter should also be used.
+**❌ Неправильні варіанти:**
+- *…within the service definition* — змінні середовища задають у task definition, а не в описі сервісу.
+- *Standard parameters … under the secrets parameter* — потрібен параметр `environment` (`secrets` — для значень із Secrets Manager/SSM).
+- *Standard parameters … under the WorkingDirectory parameter* — `WorkingDirectory` — робочий каталог, а не змінні.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_definition_parameters.html#container_definition_environment>
 
@@ -209,7 +177,7 @@ Advanced container definition parameters must be used to pass the environment va
 
 <a id="t04-q03"></a>
 ### T04-Q03
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A Developer is migrating Docker containers to Amazon ECS. A large number of containers will be deployed onto an existing ECS cluster that uses container instances of different instance types.
 
@@ -220,35 +188,18 @@ Which task placement strategy can be used to minimize the number of container in
 - ▫️ distinctInstance
 - ▫️ random
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-When a task that uses the EC2 launch type is launched, Amazon ECS must determine where to place the task based on the requirements specified in the task definition, such as CPU and memory. Similarly, when you scale down the task count, Amazon ECS must determine which tasks to terminate. You can apply task placement strategies and constraints to customize how Amazon ECS places and terminates tasks. Task placement strategies and constraints are not supported for tasks using the Fargate launch type. By default, Fargate tasks are spread across Availability Zones.
+**✅ Правильна відповідь: «binpack»**
 
-A task placement strategy is an algorithm for selecting instances for task placement or tasks for termination. For example, Amazon ECS can select instances at random, or it can select instances such that tasks are distributed evenly across a group of instances.
+Для задач на EC2 launch type ECS вирішує, де їх розмістити з урахуванням CPU і пам'яті з task definition, а при зменшенні — які задачі зупинити. Це налаштовується стратегіями і обмеженнями розміщення. (На Fargate вони не підтримуються, задачі за замовчуванням розподіляються по AZ.)
 
-Amazon ECS supports the following task placement strategies:
+Стратегії: **binpack** (за найменшим залишком CPU або пам'яті, мінімізує кількість інстансів), **random**, **spread** (рівномірно за `instanceId` або атрибутом). Тут потрібен binpack за пам'яттю.
 
-• binpack
-
-Place tasks based on the least available amount of CPU or memory. This minimizes the number of instances in use.
-
-• random
-
-Place tasks randomly.
-
-• spread
-
-Place tasks evenly based on the specified value. Accepted values are instanceId (or host, which has the same effect), or any platform or custom attribute that is applied to a container instance, such as attribute:ecs.availability-zone. Service tasks are spread based on the tasks from that service. Standalone tasks are spread based on the tasks from the same task group.
-
-The Developer should use the binpack task placement strategy using available memory to determine the placement of tasks. This will minimize the number of container instances required.
-
-CORRECT: "binpack" is the correct answer.
-
-INCORRECT: "random" is incorrect as this would just randomly assign the tasks across the available container instances in the cluster.
-
-INCORRECT: "spread" is incorrect as this would attempt to spread the tasks across the cluster instances for better high availability.
-
-INCORRECT: "distinctInstance" is incorrect as this is a task placement constraint, not a strategy. This constraint would result in the tasks being each placed on a separate instance which would not assist with meeting the requirements.
+**❌ Неправильні варіанти:**
+- *random* — випадковий розподіл.
+- *spread* — розподіляє задачі для доступності, а не ущільнює.
+- *distinctInstance* — це обмеження (constraint), а не стратегія, і воно розміщує кожну задачу на окремому інстансі.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html>
 
@@ -258,7 +209,7 @@ INCORRECT: "distinctInstance" is incorrect as this is a task placement constrain
 
 <a id="t04-q07"></a>
 ### T04-Q07
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 ```json
 A Developer has created a task definition that includes the following JSON code:
@@ -276,31 +227,16 @@ What will be the effect for tasks using this task definition?
 - ▫️ They will be placed only on container instances of T2 or T3 instance types
 - ✅ They will be placed only on container instances using the T2 instance type
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-A task placement constraint is a rule that is considered during task placement. Task placement constraints can be specified when either running a task or creating a new service.
+**✅ Правильна відповідь: «They will be placed only on container instances using the T2 instance type»**
 
-The memberOf task placement constraint places tasks on container instances that satisfy an expression.
+Task placement constraint — правило, яке враховується при розміщенні задач. `memberOf` розміщує задачі лише на інстансах, що відповідають виразу. Його можна задати при запуску задачі, створенні сервісу, реєстрації task definition або її нової ревізії (`CreateService`, `UpdateService`, `RegisterTaskDefinition`, `RunTask`). Вираз `attribute:ecs.instance-type =~ t2.*` означає будь-який тип T2 (t2.micro, t2.large тощо).
 
-The memberOf task placement constraint can be specified with the following actions:
-
-• Running a task
-
-• Creating a new service
-
-• Creating a new task definition
-
-• Creating a new revision of an existing task definition
-
-The example JSON code uses the memberOf constraint to place tasks on T2 instances. It can be specified with the following actions: CreateService, UpdateService, RegisterTaskDefinition, and RunTask.
-
-CORRECT: "They will be placed only on container instances using the T2 instance type" is the correct answer.
-
-INCORRECT: "They will be added to distinct instances using the T2 instance type" is incorrect. The memberOf constraint does not choose distinct instances.
-
-INCORRECT: "They will be placed only on container instances of T2 or T3 instance types" is incorrect as only T2 instance types will be used. The wildcard means any T2 instance type such as t2.micro or t2.large.
-
-INCORRECT: "They will be spread across all instances except for T2 instances" is incorrect as this code ensures the instances WILL be placed on T2 instance types.
+**❌ Неправильні варіанти:**
+- *Distinct instances using T2* — `memberOf` не гарантує окремих інстансів (це `distinctInstance`).
+- *T2 or T3* — лише T2.
+- *All instances except T2* — навпаки, лише T2.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html>
 
@@ -310,7 +246,7 @@ INCORRECT: "They will be spread across all instances except for T2 instances" is
 
 <a id="t04-q36"></a>
 ### T04-Q36
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A developer is building a Docker application on Amazon ECS that will use an Application Load Balancer (ALB). The developer needs to configure the port mapping between the host port and container port. Where is this setting configured?
 
@@ -319,25 +255,20 @@ A developer is building a Docker application on Amazon ECS that will use an Appl
 - ✅ Task definition
 - ▫️ Service scheduler
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Port mappings allow containers to access ports on the host container instance to send or receive traffic. Port mappings are specified as part of the container definition.
+**✅ Правильна відповідь: «Task definition»**
 
-The container definition settings are specified within the task definition. The relevant settings are:
+Port mappings дають контейнерам доступ до портів хоста. Вони задаються в container definition, а container definitions — у **task definition**:
+- `containerPort` — порт у контейнері;
+- `hostPort` — порт на інстансі, зарезервований для контейнера.
 
-containerPort - the port number on the container that is bound to the user-specified or automatically assigned host port.
+З ALB можна використати dynamic port mapping (`hostPort: 0`), щоб запускати кілька задач сервісу на одному інстансі.
 
-hostPort - the port number on the container instance to reserve for your container.
-
-With an ALB you can use Dynamic port mapping which makes it easier to run multiple tasks on the same Amazon ECS service on an Amazon ECS cluster. This is configured by setting the host port to 0, as in the image below:
-
-CORRECT: "Task definition" is the correct answer.
-
-INCORRECT: "Host definition" is incorrect as there’s no such thing.
-
-INCORRECT: "Service scheduler" is incorrect as the service scheduler is responsible for scheduling tasks and placing those tasks.
-
-INCORRECT: "Container instance" is incorrect as you don’t specify any settings on the container instance to control the host and container port mappings.
+**❌ Неправильні варіанти:**
+- *Host definition* — такого немає.
+- *Service scheduler* — планує й розміщує задачі.
+- *Container instance* — на інстансі port mappings не налаштовують.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PortMapping.html> · <https://aws.amazon.com/premiumsupport/knowledge-center/dynamic-port-mapping-ecs/>
 
@@ -347,7 +278,7 @@ INCORRECT: "Container instance" is incorrect as you don’t specify any settings
 
 <a id="t04-q61"></a>
 ### T04-Q61
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute) · дублікат [T02-Q22](../../questions/1-development/containers.md#t02-q22)*
+*домен: визначено автоматично (у джерелі: AWS Compute) · дублікат [T02-Q22](../../questions/1-development/containers.md#t02-q22)*
 
 A company runs many microservices applications that use Docker containers. The company are planning to migrate the containers to Amazon ECS. The workloads are highly variable and therefore the company prefers to be charged per running task.
 
@@ -358,19 +289,15 @@ Which solution is the BEST fit for the company’s requirements?
 - ▫️ Amazon ECS with the EC2 launch type
 - ▫️ An Amazon ECS Cluster with Auto Scaling
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-The key requirement is that the company should be charged per running task. Therefore, the best answer is to use Amazon ECS with the Fargate launch type as with this model AWS charge you for running tasks rather than running container instances.
+**✅ Правильна відповідь: «Amazon ECS with the Fargate launch type»** *(дублікат T02-Q22)*
 
-The Fargate launch type allows you to run your containerized applications without the need to provision and manage the backend infrastructure. You just register your task definition and Fargate launches the container for you. The Fargate Launch Type is a serverless infrastructure managed by AWS.
+Ключова вимога — платити за запущені задачі. На Fargate AWS бере плату за задачі, а не за container instances. Fargate — serverless: реєструєш task definition, і контейнер запускається без провізіонінгу інфраструктури.
 
-CORRECT: "Amazon ECS with the Fargate launch type" is the correct answer.
-
-INCORRECT: "Amazon ECS with the EC2 launch type" is incorrect as with this launch type you pay for running container instances (EC2 instances).
-
-INCORRECT: "An Amazon ECS Service with Auto Scaling" is incorrect as this does not specify the launch type. You can run an ECS Service on the Fargate or EC2 launch types.
-
-INCORRECT: "An Amazon ECS Cluster with Auto Scaling" is incorrect as this does not specify the launch type. You can run an ECS Cluster on the Fargate or EC2 launch types.
+**❌ Неправильні варіанти:**
+- *ECS with the EC2 launch type* — платиш за EC2-інстанси.
+- *ECS Service with Auto Scaling* і *ECS Cluster with Auto Scaling* — launch type не вказано.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html>
 
@@ -380,7 +307,7 @@ INCORRECT: "An Amazon ECS Cluster with Auto Scaling" is incorrect as this does n
 
 <a id="t06-q35"></a>
 ### T06-Q35
-*✅ відповів правильно · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 An organization has a new containerized application that needs to be launched quickly. The team lead has stated to choose the option that would reduce the burden of infrastructure maintenance for the team.
 
@@ -391,23 +318,16 @@ Which solution best meets this requirement?
 - ▫️ Use AWS Fargate to provide a template that supports a quick launch of Amazon Elastic Container Service (ECS) applications on Amazon Elastic Compute Cloud (EC2).
 - ▫️ Use AWS Copilot to provide a template that supports a quick launch of Amazon Elastic Container Service (ECS) applications on Amazon Elastic Compute Cloud (EC2).
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Copilot can run tasks and services on serverless infrastructures such as AWS Fargate. This can provide the support of containers using ECS and serverless services like Fargate does not require customers to manage.
+**✅ Правильна відповідь: «Use AWS Copilot to provide a template that supports a quick launch of Amazon Elastic Container Service (ECS) applications on AWS Fargate.»**
 
-CORRECT: “Use AWS Copilot to provide a template that supports a quick launch of Amazon Elastic Container Service (ECS) applications on AWS Fargate” is the correct answer (as explained above.)
+AWS Copilot — CLI для швидкого запуску контейнерних застосунків на ECS. Він може запускати задачі й сервіси на serverless-інфраструктурі Fargate, якою клієнтам не потрібно керувати.
 
-INCORRECT: "Use AWS Copilot to provide a template that supports a quick launch of Amazon Elastic Container Service (ECS) applications on Amazon Elastic Compute Cloud (EC2)" is incorrect.
-
-EC2 is not a serverless service and would require additional maintenance and support from the development team.
-
-INCORRECT: "Use AWS Fargate to provide a template that supports a quick launch of Amazon Elastic Container Service (ECS) applications on Amazon Elastic Compute Cloud (EC2)" is incorrect.
-
-EC2 is not a serverless service and would require additional maintenance and support from the development team. Fargate is a serverless compute engine. It would not provide a template to support a quick launch.
-
-INCORRECT: "Use Amazon Elastic Container Service (ECS) to provide a template that supports a quick launch of AWS Fargate applications on Amazon Elastic Compute Cloud (EC2)" is incorrect.
-
-EC2 is not a serverless service and would require additional maintenance and support from the development team. ECS is a container orchestration service that would not provide a template.
+**❌ Неправильні варіанти:**
+- *Copilot → ECS on EC2* — EC2 не serverless і потребує обслуговування.
+- *Fargate provides a template* — Fargate — serverless compute engine, шаблонів він не надає; до того ж EC2 не serverless.
+- *ECS provides a template* — ECS — оркестратор контейнерів і шаблонів не надає; до того ж EC2 не serverless.
 
 Джерела: <https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/deploy-a-clustered-application-to-amazon-ecs-by-using-aws-copilot.html>
 
@@ -417,7 +337,7 @@ EC2 is not a serverless service and would require additional maintenance and sup
 
 <a id="t07-q21"></a>
 ### T07-Q21
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 Your company is planning to move away from reserving EC2 instances and would like to adopt a more agile form of serverless architecture.
 
@@ -428,23 +348,18 @@ Which of the following is the simplest and the least effort way of deploying the
 - ▫️ AWS Elastic Beanstalk
 - ▫️ Amazon Elastic Container Service (Amazon ECS) on EC2
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Amazon Elastic Container Service (Amazon ECS) on Fargate»**
 
-Amazon Elastic Container Service (Amazon ECS) on Fargate - Amazon Elastic Container Service (Amazon ECS) is a highly scalable, fast, container management service that makes it easy to run, stop, and manage Docker containers on a cluster. You can host your cluster on a serverless infrastructure that is managed by Amazon ECS by launching your services or tasks using the Fargate launch type.
+ECS — швидкий масштабований сервіс для запуску й керування Docker-контейнерами в кластері. З launch type Fargate інфраструктура serverless і керується AWS. Fargate працює з ECS і EKS: сервери не потрібні, ресурси задаються й оплачуються для кожного застосунку, а ізоляція підвищує безпеку.
 
-AWS Fargate is a serverless compute engine for containers that works with both Amazon Elastic Container Service (ECS) and Amazon Elastic Kubernetes Service (EKS). Fargate makes it easy for you to focus on building your applications. Fargate removes the need to provision and manage servers, lets you specify and pay for resources per application, and improves security through application isolation by design.
+Огляд: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html
 
-ECS Fargate Overview:  via - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html
-
-Incorrect options:
-
-Amazon Elastic Container Service (Amazon ECS) on EC2 - Amazon Elastic Container Service (Amazon ECS) is a highly scalable, fast, container management service that makes it easy to run, stop, and manage Docker containers on a cluster. ECS uses EC2 instances and hence cannot be called a serverless solution.
-
-Amazon Elastic Kubernetes Service (Amazon EKS) on Fargate - Amazon Elastic Kubernetes Service (Amazon EKS) is a fully managed Kubernetes service. You can choose to run your EKS clusters using AWS Fargate, which is a serverless compute for containers. Since the use-case talks about the simplest and the least effort way to deploy Docker containers, EKS is not the best fit as you can use ECS Fargate to build a much easier solution. EKS is better suited to run Kubernetes on AWS without needing to install and operate your own Kubernetes control plane or worker nodes.
-
-AWS Elastic Beanstalk - AWS Elastic Beanstalk is an easy-to-use service for deploying and scaling web applications and services. You can simply upload your code and Elastic Beanstalk automatically handles the deployment, from capacity provisioning, load balancing, auto-scaling to application health monitoring. At the same time, you retain full control over the AWS resources powering your application and can access the underlying resources at any time. Beanstalk uses EC2 instances for its deployment, hence cannot be called a serverless architecture.
+**❌ Неправильні варіанти:**
+- *ECS on EC2* — використовує EC2-інстанси, тож це не serverless.
+- *EKS on Fargate* — serverless, але Kubernetes складніший; для найпростішого рішення ECS на Fargate кращий.
+- *Elastic Beanstalk* — простий деплой вебзастосунків, але працює на EC2, тож не serverless.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html> · <https://aws.amazon.com/eks/> · <https://aws.amazon.com/elasticbeanstalk/>
 
@@ -454,7 +369,7 @@ AWS Elastic Beanstalk - AWS Elastic Beanstalk is an easy-to-use service for depl
 
 <a id="t08-q05"></a>
 ### T08-Q05
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A Developer is creating a service on Amazon ECS and needs to ensure that each task is placed on a different container instance.
 
@@ -465,44 +380,23 @@ How can this be achieved?
 - ✅ Use a task placement constraint
 - ▫️ Use a task placement strategy
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-A task placement constraint is a rule that is considered during task placement. Task placement constraints can be specified when either running a task or creating a new service.
+**✅ Правильна відповідь: «Use a task placement constraint»**
 
-Amazon ECS supports the following types of task placement constraints:
+Task placement constraint — правило, яке враховується під час розміщення задач. Його задають під час запуску задачі або створення сервісу. Типи:
+- **`distinctInstance`** — кожна задача на окремому container instance.
+- **`memberOf`** — задачі лише на інстансах, що відповідають виразу Cluster Query Language. Задається при запуску задачі, створенні сервісу, створенні task definition або її нової ревізії.
 
-distinctInstance
+Приклад, щоб кожна задача працювала на окремому інстансі:
+```json
+"placementConstraints": [ { "type": "distinctInstance" } ]
+```
 
-Place each task on a different container instance. This task placement constraint can be specified when either running a task or creating a new service.
-
-memberOf
-
-Place tasks on container instances that satisfy an expression. For more information about the expression syntax for constraints, see Cluster Query Language.
-
-The memberOf task placement constraint can be specified with the following actions:
-
-Running a task
-
-Creating a new service
-
-Creating a new task definition
-
-Creating a new revision of an existing task definition
-
-The following code can be used in a task definition to specify a task placement constraint that ensures that each task will run on a distinct instance:
-
-"placementConstraints": [
-{
-"type": "distinctInstance"
-}
-]
-CORRECT: "Use a task placement constraint" is the correct answer.
-
-INCORRECT: "Use a task placement strategy" is incorrect as this is used to select instances for task placement using the binpack, random and spread algorithms.
-
-INCORRECT: "Create a service on Fargate" is incorrect as Fargate spreads tasks across AZs but not instances.
-
-INCORRECT: "Create a cluster with multiple container instances" is incorrect as this will not guarantee that each task runs on a different container instance.
+**❌ Неправильні варіанти:**
+- *Task placement strategy* — вибирає інстанси за алгоритмами binpack, random і spread, але не гарантує розміщення.
+- *Service on Fargate* — Fargate розподіляє задачі по AZ, а container instances у ньому немає.
+- *Multiple container instances* — кілька інстансів не гарантують, що кожна задача буде на окремому.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html>
 
@@ -512,7 +406,7 @@ INCORRECT: "Create a cluster with multiple container instances" is incorrect as 
 
 <a id="t08-q22"></a>
 ### T08-Q22
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 A Developer is deploying an application using Docker containers on Amazon ECS. One of the containers runs a database and should be placed on instances in the “databases” task group.
 
@@ -523,47 +417,23 @@ What should the Developer use to control the placement of the database task?
 - ▫️ IAM Group
 - ✅ Task Placement Constraint
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-A task placement constraint is a rule that is considered during task placement. Task placement constraints can be specified when either running a task or creating a new service. The task placement constraints can be updated for existing services as well.
+**✅ Правильна відповідь: «Task Placement Constraint»**
 
-Amazon ECS supports the following types of task placement constraints:
+Task placement constraint — правило, яке враховується під час розміщення задач. Його задають при запуску задачі чи створенні сервісу і можна оновлювати для наявних сервісів.
+- **`distinctInstance`** — кожна задача на окремому інстансі.
+- **`memberOf`** — задачі на інстансах, що відповідають виразу Cluster Query Language.
 
-distinctInstance
+Приклад розміщення задач у групі `databases`; працює з `CreateService`, `UpdateService`, `RegisterTaskDefinition` і `RunTask`:
+```json
+"placementConstraints": [ { "expression": "task:group == databases", "type": "memberOf" } ]
+```
 
-Place each task on a different container instance. This task placement constraint can be specified when either running a task or creating a new service.
-
-memberOf
-
-Place tasks on container instances that satisfy an expression. For more information about the expression syntax for constraints, see Cluster Query Language.
-
-The memberOf task placement constraint can be specified with the following actions:
-
-• Running a task
-
-• Creating a new service
-
-• Creating a new task definition
-
-• Creating a new revision of an existing task definition
-
-The example task placement constraint below uses the memberOf constraint to place tasks on instances in the databases task group. It can be specified with the following actions: CreateService, UpdateService, RegisterTaskDefinition, and RunTask.
-
-"placementConstraints": [
-{
-"expression": "task:group == databases",
-"type": "memberOf"
-}
-]
-The Developer should therefore use task placement constraints as in the above example to control the placement of the database task.
-
-CORRECT: "Task Placement Constraint" is the correct answer.
-
-INCORRECT: "Cluster Query Language" is incorrect. Cluster queries are expressions that enable you to group objects. For example, you can group container instances by attributes such as Availability Zone, instance type, or custom metadata.
-
-INCORRECT: "IAM Group" is incorrect as you cannot control task placement on ECS with IAM Groups. IAM groups are used for organizing IAM users and applying policies to them.
-
-INCORRECT: "ECS Container Agent" is incorrect. The Amazon ECS container agent allows container instances to connect to your cluster.
+**❌ Неправильні варіанти:**
+- *Cluster Query Language* — це лише мова виразів для групування за AZ, типом інстансу чи метаданими. Використовується всередині constraint, а не замість нього.
+- *IAM Group* — групує IAM-користувачів і не керує розміщенням задач.
+- *ECS Container Agent* — підключає інстанси до кластера.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html>
 
@@ -573,7 +443,7 @@ INCORRECT: "ECS Container Agent" is incorrect. The Amazon ECS container agent al
 
 <a id="t10-q55"></a>
 ### T10-Q55
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Compute)*
+*домен: визначено автоматично (у джерелі: AWS Compute)*
 
 ```json
 A Developer has created a task definition that includes the following JSON code:
@@ -591,31 +461,16 @@ What will be the effect for tasks using this task definition?
 - ▫️ They will become members of a task group called “databases”
 - ▫️ They will not be allowed to run unless they have the “databases” tag assigned
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-A task placement constraint is a rule that is considered during task placement. Task placement constraints can be specified when either running a task or creating a new service.
+**✅ Правильна відповідь: «They will be placed on container instances in the “databases” task group»**
 
-The memberOf task placement constraint places tasks on container instances that satisfy an expression.
+Task placement constraint — правило для розміщення задач. `memberOf` розміщує задачі лише на container instances, що відповідають виразу. Його задають при запуску задачі, створенні сервісу, створенні task definition або нової ревізії; у API — `CreateService`, `UpdateService`, `RegisterTaskDefinition`, `RunTask`. Тут вираз `task:group == databases`, тож задачі розміщуються поряд із задачами групи «databases».
 
-The memberOf task placement constraint can be specified with the following actions:
-
-• Running a task
-
-• Creating a new service
-
-• Creating a new task definition
-
-• Creating a new revision of an existing task definition
-
-The example JSON code uses the memberOf constraint to place tasks on instances in the databases task group. It can be specified with the following actions: CreateService, UpdateService, RegisterTaskDefinition, and RunTask.
-
-CORRECT: "They will be placed on container instances in the “databases” task group" is the correct answer.
-
-INCORRECT: "They will become members of a task group called “databases”" is incorrect. They will be placed on container instances in the “databases” task group.
-
-INCORRECT: "They will not be placed on container instances in the “databases” task group" is incorrect. This statement ensures the tasks ARE placed on the container instances in the “databases” task group.
-
-INCORRECT: "They will not be allowed to run unless they have the “databases” tag assigned" is incorrect. This JSON code is not related to tagging of the tasks.
+**❌ Неправильні варіанти:**
+- *Become members of the group* — constraint визначає, де розмістити задачі, а не членство в групі.
+- *Will not be placed* — навпаки: розміщуються саме там.
+- *Require a “databases” tag* — до тегів не стосується.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html>
 
@@ -625,7 +480,7 @@ INCORRECT: "They will not be allowed to run unless they have the “databases”
 
 <a id="t11-q11"></a>
 ### T11-Q11
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 ECS Fargate container tasks are usually spread across Availability Zones (AZs) and the underlying workloads need persistent cross-AZ shared access to the data volumes configured for the container tasks.
 
@@ -636,27 +491,16 @@ Which of the following solutions is the best choice for these workloads?
 - ▫️ AWS Gateway Storage volumes
 - ▫️ Bind mounts
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Amazon EFS volumes»**
 
-Amazon EFS volumes - EFS volumes provide a simple, scalable, and persistent file storage for use with your Amazon ECS tasks. With Amazon EFS, storage capacity is elastic, growing and shrinking automatically as you add and remove files. Your applications can have the storage they need, when they need it. Amazon EFS volumes are supported for tasks hosted on Fargate or Amazon EC2 instances.
+EFS дає просте, масштабоване й постійне файлове сховище для задач ECS. Ємність росте й зменшується автоматично. Підтримується і на Fargate, і на EC2. Задачі мають доступ до того самого сховища незалежно від інстансу, на якому запущені. Для EC2 AMI має монтувати EFS до старту Docker, а task definitions — посилатися на ці точки монтування. У сучасних ECS EFS задають прямо в task definition через `efsVolumeConfiguration`.
 
-You can use Amazon EFS file systems with Amazon ECS to export file system data across your fleet of container instances. That way, your tasks have access to the same persistent storage, no matter the instance on which they land. However, you must configure your container instance AMI to mount the Amazon EFS file system before the Docker daemon starts. Also, your task definitions must reference volume mounts on the container instance to use the file system.
-
-Incorrect options:
-
-Docker volumes - A Docker-managed volume that is created under /var/lib/docker/volumes on the host Amazon EC2 instance. Docker volume drivers (also referred to as plugins) are used to integrate the volumes with external storage systems, such as Amazon EBS. The built-in local volume driver or a third-party volume driver can be used. Docker volumes are only supported when running tasks on Amazon EC2 instances.
-
-Bind mounts - A file or directory on the host, such as an Amazon EC2 instance or AWS Fargate, is mounted into a container. Bind mount host volumes are supported for tasks hosted on Fargate or Amazon EC2 instances. Bind mounts provide temporary storage, and hence these are a wrong choice for this use case.
-
-AWS Storage Gateway volumes - This is an incorrect choice, given only as a distractor.
-
-Reference:
-
-https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_data_volumes.html
-
-https://aws.amazon.com/blogs/containers/amazon-ecs-availability-best-practices/
+**❌ Неправильні варіанти:**
+- *Docker volumes* — створюються в `/var/lib/docker/volumes` на хості, лише на EC2, не спільні.
+- *Bind mounts* — тимчасове сховище на хості.
+- *Storage Gateway volumes* — не для ECS.
 
 </details>
 
@@ -664,7 +508,7 @@ https://aws.amazon.com/blogs/containers/amazon-ecs-availability-best-practices/
 
 <a id="t12-q16"></a>
 ### T12-Q16
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 An application runs on Amazon Elastic Container Service (Amazon ECS) on AWS Fargate. The company's audit requirements mandate that logging and storing of application log data must be done centrally on AWS.
 
@@ -675,25 +519,18 @@ How will you configure this requirement?
 - ▫️ Use the awslogs log driver to send log information to CloudWatch Logs. To turn on the awslogs log driver, your Amazon ECS container instances require at least version 1.9.0 of the container agent
 - ▫️ Download and install the unified CloudWatch agent on the ECS instances to collect internal system-level metrics and application logs from the instances. The logs collected by the unified CloudWatch agent are processed and stored in Amazon CloudWatch logs and can be queried for report generation
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Use the awslogs log driver to configure the containers in your tasks to send log information to CloudWatch Logs. Add the required logConfiguration parameters to your task definition»**
 
-Use the awslogs log driver to configure the containers in your tasks to send log information to CloudWatch Logs. Add the required logConfiguration parameters to your task definition
+Драйвер логів `awslogs` змушує контейнери задачі надсилати логи в CloudWatch Logs. Для Fargate в task definition додають параметри `logConfiguration`, щоб увімкнути `awslogs`. Наприклад, кожен контейнер має свій `logConfiguration`: контейнер WordPress пише в log group `awslogs-wordpress`, MySQL — в `awslogs-mysql`, з префіксом stream `awslogs-example`.
 
-Using the awslogs log driver you can configure the containers in your tasks to send log information to CloudWatch Logs. If you're using the Fargate launch type for your tasks, you need to add the required logConfiguration parameters to your task definition to turn on the awslogs log driver.
+Детальніше: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html#specify-log-config
 
-Before your containers can send logs to CloudWatch, you must specify the awslogs log driver for containers in your task definition. The example task definition JSON that follows has a logConfiguration object specified for each container. One is for the WordPress container that sends logs to a log group called awslogs-wordpress. The other is for a MySQL container that sends logs to a log group that's called awslogs-mysql. Both containers use the awslogs-example log stream. prefix.
-
-Specifying a log configuration in your task definition:  via - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html#specify-log-config
-
-Incorrect options:
-
-Use the awslogs log driver to send log information to CloudWatch Logs. To turn on the awslogs log driver, your Amazon ECS container instances require at least version 1.9.0 of the container agent - This statement is incorrect. If you're using the EC2 launch type (and not Fargate) for your tasks and want to turn on the awslogs log driver, your Amazon ECS container instances require at least version 1.9.0 of the container agent.
-
-Amazon ECS metric data is automatically sent to CloudWatch in 1-minute periods. Amazon ECS service using the Fargate launch type has CloudWatch CPU and memory utilization metrics that can be enabled from the ECS console - Indeed, Amazon ECS metric data is automatically sent to CloudWatch in 1-minute periods. Also, any Amazon ECS service using the Fargate launch type has CloudWatch CPU and memory utilization metrics automatically, so you don't need to take any manual steps. But, these are system logs and not the application logs as is needed in the current use case.
-
-Download and install the unified CloudWatch agent on the ECS instances to collect internal system-level metrics and application logs from the instances. The logs collected by the unified CloudWatch agent are processed and stored in Amazon CloudWatch logs and can be queried for report generation - This statement is incorrect and given only as a distractor. ECS Fargate is serverless and hence the scope of downloading and installing software on the instance does not arise.
+**❌ Неправильні варіанти:**
+- *Container agent version 1.9.0* — вимога щодо агента стосується EC2 launch type, а не Fargate.
+- *ECS metrics every 1 minute* — метрики CPU і пам'яті для Fargate справді є автоматично, але це системні метрики, а потрібні логи застосунку.
+- *Install CloudWatch agent on ECS instances* — Fargate serverless, і встановлювати ПЗ на інстанси неможливо.
 
 Джерела: <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html> · <https://docs.aws.amazon.com/AmazonECS/latest/userguide/cloudwatch-metrics.html#available_cloudwatch_metrics>
 

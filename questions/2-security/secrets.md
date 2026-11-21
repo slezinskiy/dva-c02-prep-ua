@@ -3,11 +3,11 @@
 **Домен 2 — Безпека** · питань: 10  
 Теорія: [02-domain2-security.md](../../02-domain2-security.md#secrets) · [Протиріччя](../../06-contradictions-and-traps.md) · [Застарілі/сумнівні відповіді](../../07-outdated-and-wrong-answers.md) · [Усі розділи](../README.md)
 
-> Тексти питань і пояснення — оригінальні англійською (на екзамені теж англійська). ✅ — правильна відповідь за ключем банку, ❌ — твоя минула помилкова відповідь. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
+> Тексти питань і варіантів — англійською (як на екзамені), пояснення — українською. ✅ — правильна відповідь за ключем банку. ⚠️ — питання з протиріччям або сумнівним/застарілим ключем: читай примітку.
 
 <a id="t03-q10"></a>
 ### T03-Q10
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You are planning to build a fleet of EBS-optimized EC2 instances to handle the load of your new application. Due to security compliance, your organization wants any secret strings used in the application to be encrypted to prevent exposing values as clear text.
 
@@ -19,33 +19,18 @@ The solution requires that decryption events be audited and API calls to be simp
 - ▫️ Audit using SSM Audit Trail
 - ✅ Audit using CloudTrail
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct options:
+**✅ Правильні відповіді: «Store the secret as SecureString in SSM Parameter Store» та «Audit using CloudTrail»**
 
-Store the secret as SecureString in SSM Parameter Store
+У Parameter Store параметри типу **SecureString** мають відкрите ім'я і зашифроване значення; шифрує й розшифровує їх AWS KMS. З customer managed ключем доступ до шифрування й розшифрування регулюють IAM- і key-політики. Розшифроване значення отримують одним викликом API (`GetParameter --with-decryption`).
 
-With AWS Systems Manager Parameter Store, you can create SecureString parameters, which are parameters that have a plaintext parameter name and an encrypted parameter value. Parameter Store uses AWS KMS to encrypt and decrypt the parameter values of Secure String parameters. Also, if you are using customer-managed CMKs, you can use IAM policies and key policies to manage to encrypt and decrypt permissions. To retrieve the decrypted value you only need to do one API call.
+AWS CloudTrail логує й зберігає всі дії в акаунті (консоль, SDK, CLI, сервіси), тобто покаже всі виклики до SSM і KMS, включно з розшифруваннями.
 
- via - https://docs.aws.amazon.com/kms/latest/developerguide/services-parameter-store.html
-
-Audit using CloudTrail
-
-AWS CloudTrail is a service that enables governance, compliance, operational auditing, and risk auditing of your AWS account. With CloudTrail, you can log, continuously monitor, and retain account activity related to actions across your AWS infrastructure. CloudTrail provides an event history of your AWS account activity, including actions taken through the AWS Management Console, AWS SDKs, command-line tools, and other AWS services.
-
-CloudTrail will allow you to see all API calls made to SSM and KMS.
-
-Incorrect options:
-
-Encrypt first with KMS then store in SSM Parameter store - This could work but will require two API calls to get the decrypted value instead of one. So this is not the right option.
-
-Store the secret as PlainText in SSM Parameter Store - Plaintext parameters are not secure and shouldn't be used to store secrets.
-
-Audit using SSM Audit Trail - This is a made-up option and has been added as a distractor.
-
-Reference:
-
-https://docs.aws.amazon.com/kms/latest/developerguide/services-parameter-store.html
+**❌ Неправильні варіанти:**
+- *Encrypt first with KMS then store in SSM* — спрацює, але для отримання значення потрібно два виклики замість одного.
+- *Store the secret as PlainText* — незахищено.
+- *SSM Audit Trail* — вигадано.
 
 </details>
 
@@ -53,7 +38,7 @@ https://docs.aws.amazon.com/kms/latest/developerguide/services-parameter-store.h
 
 <a id="t05-q12"></a>
 ### T05-Q12
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
+*домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
 
 An application runs on a fleet of Amazon EC2 instances and stores data in a Microsoft SQL Server database hosted on Amazon RDS. The developer wants to avoid storing database connection credentials the application code. The developer would also like a solution that automatically rotates the credentials.
 
@@ -64,23 +49,16 @@ What is the MOST secure way to store and access the database credentials?
 - ▫️ Use AWS Systems Manager Parameter store to store the credentials. Enable automatic rotation of the credentials.
 - ▫️ Store the credentials in an encrypted source code repository. Retrieve the credentials from AWS CodeCommit as needed.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Secrets Manager can be used for secure storage of secrets such as database connection credentials. Automatic rotation is supported for several RDS database types including Microsoft SQL Server. This is the most secure solution for storing and retrieving the credentials.
+**✅ Правильна відповідь: «Use AWS Secrets Manager to store the credentials. Retrieve the credentials from Secrets Manager as needed.»**
 
-CORRECT: "Use AWS Secrets Manager to store the credentials. Retrieve the credentials from Secrets Manager as needed" is the correct answer (as explained above.)
+AWS Secrets Manager призначений для безпечного зберігання секретів, зокрема облікових даних до БД. Він підтримує автоматичну ротацію для кількох типів RDS, включно з Microsoft SQL Server. Це найбезпечніший спосіб зберігати й отримувати облікові дані.
 
-INCORRECT: "Use AWS Systems Manager Parameter store to store the credentials. Enable automatic rotation of the credentials" is incorrect.
-
-With SSM Parameter Store you cannot enable automatic rotation. You can rotate the credentials but you would need to configure your own Lambda function.
-
-INCORRECT: "Create an IAM role that has permissions to access the database. Attach the role to the EC2 instance" is incorrect.
-
-RDS for SQL Server does support windows authentication using a managed Microsoft AD with IAM roles for permissions to the AD service, but this is not described in the solution.
-
-INCORRECT: "Store the credentials in an encrypted source code repository. Retrieve the credentials from AWS CodeCommit as needed" is incorrect.
-
-This is not a solution that is suitable for retrieving database connection credentials and it does not support automatic rotation.
+**❌ Неправильні варіанти:**
+- *SSM Parameter Store with automatic rotation* — Parameter Store не має вбудованої автоматичної ротації; її можна зробити лише власною Lambda-функцією.
+- *IAM role attached to EC2* — RDS for SQL Server підтримує Windows-автентифікацію через Managed Microsoft AD, але в цьому сценарії її не описано.
+- *Encrypted source code repository / CodeCommit* — репозиторій коду не підходить для зберігання облікових даних до БД і не підтримує автоматичну ротацію.
 
 Джерела: <https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html>
 
@@ -90,7 +68,7 @@ This is not a solution that is suitable for retrieving database connection crede
 
 <a id="t05-q55"></a>
 ### T05-Q55
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
+*домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
 
 An application will use AWS Lambda and an Amazon RDS database. The Developer needs to secure the database connection string and enable automatic rotation every 30 days. What is the SIMPLEST way to achieve this requirement?
 
@@ -99,21 +77,16 @@ An application will use AWS Lambda and an Amazon RDS database. The Developer nee
 - ▫️ Store the connection string as an encrypted environment variable in Lambda and create a separate function that rotates the connection string every 30 days
 - ✅ Store a secret in AWS Secrets Manager and enable automatic rotation every 30 days
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Secrets Manager encrypts secrets at rest using encryption keys that you own and store in AWS Key Management Service (KMS). When you retrieve a secret, Secrets Manager decrypts the secret and transmits it securely over TLS to your local environment.
+**✅ Правильна відповідь: «Store a secret in AWS Secrets Manager and enable automatic rotation every 30 days»**
 
-With AWS Secrets Manager, you can rotate secrets on a schedule or on demand by using the Secrets Manager console, AWS SDK, or AWS CLI.
+Secrets Manager шифрує секрети в стані спокою ключами KMS. Під час отримання розшифровує їх і передає через TLS. Ротацію можна робити за розкладом або на вимогу через консоль, SDK чи CLI. Для пароля БД вказують тип БД, частоту ротації та master-облікові дані. Нативно підтримуються RDS, DocumentDB і Redshift.
 
-For example, to rotate a database password, you provide the database type, rotation frequency, and master database credentials when storing the password in Secrets Manager. Secrets Manager natively supports rotating credentials for databases hosted on Amazon RDS and Amazon DocumentDB and clusters hosted on Amazon Redshift.
-
-CORRECT: "Store a secret in AWS Secrets Manager and enable automatic rotation every 30 days" is the correct answer.
-
-INCORRECT: "Store a SecureString in Systems Manager Parameter Store and enable automatic rotation every 30 days" is incorrect as SSM Parameter Store does not support automatic key rotation.
-
-INCORRECT: "Store the connection string as an encrypted environment variable in Lambda and create a separate function that rotates the connection string every 30 days" is incorrect as this is not the simplest solution. In this scenario using AWS Secrets Manager would be easier to implement as it provides native features for rotating the secret.
-
-INCORRECT: "Store the connection string in an encrypted Amazon S3 bucket and use a scheduled CloudWatch Event to update the connection string every 30 days" is incorrect. There is no native capability of CloudWatch to update connection strings so you would need some other service such as a Lambda function to execute and rotate the connection string which is missing from this answer.
+**❌ Неправильні варіанти:**
+- *SecureString in Parameter Store with automatic rotation* — Parameter Store не має автоматичної ротації.
+- *Encrypted Lambda env variable + rotation function* — не найпростіше: Secrets Manager має ротацію з коробки.
+- *S3 + scheduled CloudWatch Event* — CloudWatch сам не оновить рядок підключення; знадобиться ще Lambda, якої у варіанті немає.
 
 Джерела: <https://aws.amazon.com/secrets-manager/features/>
 
@@ -123,7 +96,7 @@ INCORRECT: "Store the connection string in an encrypted Amazon S3 bucket and use
 
 <a id="t06-q39"></a>
 ### T06-Q39
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
+*домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
 
 > ⚠️ **Secrets Manager (Parameter Store відсутній у варіантах).** → [детальніше](../../06-contradictions-and-traps.md#c06)
 
@@ -132,27 +105,22 @@ A programmer is rolling out a new solution to Amazon ECS. This solution necessit
 What is the most efficient method for the programmer to access these variables with minimal modifications to the solution?
 
 - ▫️ Include these variables directly in the application code and use version control system to manage different versions.
-- ❌ Create environment variables for these details and access them within the application code.
+- ▫️ Create environment variables for these details and access them within the application code.
 - ▫️ Use AWS S3 to store these variables and access them via AWS SDK within the application.
 - ✅ Utilize AWS Secrets Manager to store these variables and retrieve them directly within the application using AWS SDK.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Secrets Manager is designed to handle sensitive data like this. It enables you to easily rotate, manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle. Using AWS Secrets Manager, you can secure and manage secrets used to access resources in the AWS Cloud, on third-party services, and on-premises.
+**✅ Правильна відповідь: «Utilize AWS Secrets Manager to store these variables and retrieve them directly within the application using AWS SDK.»**
 
-CORRECT: "Utilize AWS Secrets Manager to store these variables and retrieve them directly within the application using AWS SDK" is the correct answer (as explained above.)
+Secrets Manager створений для чутливих даних: облікових даних до БД, API-ключів та інших секретів. Він зберігає, ротує й видає їх протягом усього життєвого циклу — для ресурсів в AWS, сторонніх сервісів і on-premises.
 
-INCORRECT: "Include these variables directly in the application code and use version control system to manage different versions" is incorrect.
+ℹ️ В ECS секрет можна також передати в контейнер через `secrets` → `valueFrom` у task definition. Тоді він з'являється як змінна середовища, але в task definition відкритим текстом не зберігається.
 
-Including sensitive data directly in the application code is not a secure practice and doesn't comply with the principle of least privilege or best security practices.
-
-INCORRECT: "Create environment variables for these details and access them within the application code" is incorrect.
-
-Although environment variables can be used to pass some configuration to the application, they're typically visible in plaintext in multiple places such as ECS Task Definitions or the ECS console. This makes them unsuitable for sensitive data like credentials or API keys.
-
-INCORRECT: "Use AWS S3 to store these variables and access them via AWS SDK within the application" is incorrect.
-
-AWS S3 is primarily a storage service and using it to store and manage secrets doesn't align with security best practices.
+**❌ Неправильні варіанти:**
+- *In application code + VCS* — небезпечно, порушує найкращі практики безпеки.
+- *Plain environment variables* — видно відкритим текстом у task definition і консолі ECS; для секретів не годиться.
+- *S3* — це сховище об'єктів; зберігати в ньому секрети не відповідає найкращим практикам.
 
 Джерела: <https://aws.amazon.com/secrets-manager/>
 
@@ -162,28 +130,27 @@ AWS S3 is primarily a storage service and using it to store and manage secrets d
 
 <a id="t06-q44"></a>
 ### T06-Q44
-*❌ відповів неправильно · домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
+*домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
 
 A developer wants to use a cron job to schedule key rotation for an Amazon RDS database. What steps should the developer take to complete this task?
 
 - ▫️ Use AWS Identity and Access Management (IAM) to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression.
 - ✅ Use AWS Secrets Manager to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression.
-- ❌ Use AWS Systems Manager (SSM) Parameter Store to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression.
+- ▫️ Use AWS Systems Manager (SSM) Parameter Store to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression.
 - ▫️ Use AWS Relational Database Service to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Rotation is the process of periodically updating a secret. When you rotate a secret, you update the credentials in both the secret and the database or service. In Secrets Manager, you can set up automatic rotation for your secrets.
+**✅ Правильна відповідь: «Use AWS Secrets Manager to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression.»**
 
-Some services offer managed rotation, where the service configures and manages rotation for you. With managed rotation, you don't use an AWS Lambda function to update the secret and the credentials in the database. Amazon RDS can be used with managed rotation.
+Ротація — це періодичне оновлення секрету: облікові дані змінюються і в секреті, і в самій БД чи сервісі. Secrets Manager підтримує автоматичну ротацію за розкладом, зокрема заданим cron-виразом.
 
-CORRECT: "Use AWS Secrets Manager to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression" is the correct answer (as explained above.)
+Деякі сервіси пропонують **managed rotation**: ротацію налаштовує й веде сам сервіс, без вашої Lambda-функції. Так працює, зокрема, RDS.
 
-INCORRECT: "Use AWS Identity and Access Management (IAM) to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression" is incorrect. IAM is an identity and management services to help assign permissions to users, groups and roles. It does not manage secrets such as passwords or access keys.
-
-INCORRECT: "Use AWS Relational Database Service to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression" is incorrect. RDS is a used to simplify the set-up of relational databases. It is not used for managing secrets.
-
-INCORRECT: "Use AWS Systems Manager Parameter Store to create a managed rotation under the Rotation Schedule and schedule the time for the automatic rotation using a cron expression" is incorrect. The SSM Parameter store does not use cron jobs to manage rotations.
+**❌ Неправильні варіанти:**
+- *IAM managed rotation* — IAM керує дозволами користувачів, груп і ролей, а не секретами.
+- *RDS managed rotation* — RDS спрощує розгортання БД, але не є сервісом керування секретами. ℹ️ RDS може керувати master-паролем, але робить це через Secrets Manager.
+- *SSM Parameter Store* — не має вбудованої ротації за cron-розкладом.
 
 Джерела: <https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotate-secrets_schedule.html>
 
@@ -193,7 +160,7 @@ INCORRECT: "Use AWS Systems Manager Parameter Store to create a managed rotation
 
 <a id="t09-q17"></a>
 ### T09-Q17
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 > ⚠️ **Parameter Store (Secrets Manager відсутній у варіантах).** → [детальніше](../../06-contradictions-and-traps.md#c06)
 
@@ -206,31 +173,18 @@ What would be the best approach that needs minimal modifications in the applicat
 - ▫️ Configure the application to fetch the variables from an encrypted file that is stored with the application by storing the API URL and credentials in unique files for each environment
 - ✅ Configure the application to fetch the variables and credentials from AWS Systems Manager Parameter Store by leveraging hierarchical unique paths in Parameter Store for each variable in each environment
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Configure the application to fetch the variables and credentials from AWS Systems Manager Parameter Store by leveraging hierarchical unique paths in Parameter Store for each variable in each environment»**
 
-Configure the application to fetch the variables and credentials from AWS Systems Manager Parameter Store by leveraging hierarchical unique paths in Parameter Store for each variable in each environment
+Parameter Store — можливість AWS Systems Manager для безпечного ієрархічного зберігання конфігурацій і секретів. У ньому зберігають паролі, рядки підключення, ID AMI, ліцензійні коди — відкритим текстом або зашифровано. На параметри посилаються за іменем зі скриптів, команд, SSM-документів і workflows.
 
-Parameter Stores is a capability of AWS Systems Manager that provides secure, hierarchical storage for configuration data management and secrets management. You can store data such as passwords, database strings, Amazon Machine Image (AMI) IDs, and license codes as parameter values. You can store values as plain text or encrypted data. You can reference Systems Manager parameters in your scripts, commands, SSM documents, and configuration and automation workflows by using the unique name that you specified when you created the parameter.
+Плаский список із десятків чи сотень параметрів важко підтримувати: легко взяти не той параметр або продублювати дані. Ієрархії розв'язують це: ім'я параметра містить шлях через `/`, наприклад `/prod/payment/api_url` і `/dev/payment/api_url`.
 
-Managing dozens or hundreds of parameters as a flat list is time-consuming and prone to errors. It can also be difficult to identify the correct parameter for a task. This means you might accidentally use the wrong parameter, or you might create multiple parameters that use the same configuration data.
-
-You can use parameter hierarchies to help you organize and manage parameters. A hierarchy is a parameter name that includes a path that you define by using forward slashes (/).
-
- via - https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-hierarchies.html
-
-Incorrect options:
-
-Configure the application to fetch the variables from AWS KMS by storing the API URL and credentials as unique keys in KMS for each environment - AWS KMS lets you create, manage, and control cryptographic keys across your applications and AWS services. KMS is not a key-value service that can be used for the given use case.
-
-Configure the application to fetch the variables from an encrypted file that is stored with the application by storing the API URL and credentials in unique files for each environment - It is not considered a security best practice to store sensitive data and credentials in an encrypted file with the application. So this option is incorrect.
-
-Configure the application to fetch the variables from each of the deployed environments by defining the authentication information and API URL in the ECS task definition as unique names during the deployment process - ECS task definition can be thought of as a blueprint for your application. Task definitions specify various parameters for your application. Examples of task definition parameters are which containers to use, which launch type to use, which ports should be opened for your application, and what data volumes should be used with the containers in the task. The specific parameters available for the task definition depend on which launch type you are using. The task definition is a text file, in JSON format, that describes one or more containers, up to a maximum of ten, that form your application. A task is the instantiation of a task definition within a cluster. After you create a task definition for your application within Amazon ECS, you can specify the number of tasks to run on your cluster.
-
-AWS recommends storing your sensitive data in either AWS Secrets Manager secrets or AWS Systems Manager Parameter Store parameters. Environment variables specified in the task definition are readable by all users and roles that are allowed the DescribeTaskDefinition action for the task definition. So this option is incorrect.
-
- via - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/taskdef-envfiles.html
+**❌ Неправильні варіанти:**
+- *AWS KMS as key-value store* — KMS керує криптографічними ключами і не зберігає пари ключ–значення.
+- *Encrypted file with the application* — зберігати облікові дані у файлі разом із застосунком — погана практика.
+- *Environment variables in ECS task definition* — task definition — це JSON-опис застосунку: контейнери, launch type, порти, томи. Змінні середовища в ній видно кожному, хто має дозвіл `DescribeTaskDefinition`. AWS радить тримати чутливі дані в Secrets Manager або Parameter Store.
 
 Джерела: <https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-paramstore-hierarchies.html> · <https://aws.amazon.com/kms/> · <https://ecsworkshop.com/introduction/ecs_basics/task_definition/> · <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/taskdef-envfiles.html>
 
@@ -240,7 +194,7 @@ AWS recommends storing your sensitive data in either AWS Secrets Manager secrets
 
 <a id="t09-q22"></a>
 ### T09-Q22
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 A company wants to share information with a third party via an HTTP API endpoint managed by the third party. The company has the necessary API key to access the endpoint and the integration of the API key with the company's application code must not impact the application's performance.
 
@@ -251,27 +205,18 @@ What is the most secure approach?
 - ▫️ Keep the API credentials in a local code variable and use the local code variable at runtime to make the API call
 - ✅ Keep the API credentials in AWS Secrets Manager and use the credentials to make the API call by fetching the API credentials at runtime by using the AWS SDK
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Keep the API credentials in AWS Secrets Manager and use the credentials to make the API call by fetching the API credentials at runtime by using the AWS SDK»**
 
-Keep the API credentials in AWS Secrets Manager and use the credentials to make the API call by fetching the API credentials at runtime by using the AWS SDK
+Secrets Manager замінює захардкоджені облікові дані викликом API, який отримує секрет під час виконання. Секрету немає в коді, тож його не знайде той, хто переглядає код. Автоматична ротація за розкладом замінює довгострокові секрети короткостроковими.
 
-Secrets Manager enables you to replace hardcoded credentials in your code, including passwords, with an API call to Secrets Manager to retrieve the secret programmatically. This helps ensure the secret can't be compromised by someone examining your code, because the secret no longer exists in the code. Also, you can configure Secrets Manager to automatically rotate the secret for you according to a specified schedule. This enables you to replace long-term secrets with short-term ones, significantly reducing the risk of compromise.
+Раніше облікові дані вбудовували в застосунок, і для ротації його доводилося оновлювати й перерозгортати. Якщо одну зі спільних копій пропускали, застосунок падав, тож ротацію часто просто не робили. Кешування секретів додатково підвищує доступність і зменшує затримку.
 
- via - https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html
-
-In the past, when you created a custom application to retrieve information from a database, you typically embedded the credentials, the secret, for accessing the database directly in the application. When the time came to rotate the credentials, you had to do more than just create new credentials. You had to invest time to update the application to use the new credentials. Then you distributed the updated application. If you had multiple applications with shared credentials and you missed updating one of them, the application failed. Because of this risk, many customers choose not to regularly rotate credentials, which effectively substitutes one risk for another. You can also use caching with Secrets Manager to significantly improve the availability and latency of applications.
-
-Incorrect options:
-
-Keep the API credentials in an encrypted table in MySQL RDS and use the credentials to make the API call by fetching the API credentials from RDS at runtime by using the AWS SDK
-
-Keep the API credentials in an encrypted file in S3 and use the credentials to make the API call by fetching the API credentials from S3 at runtime by using the AWS SDK
-
-Keep the API credentials in a local code variable and use the local code variable at runtime to make the API call
-
-It is considered a security bad practice to keep sensitive access credentials in code, database, or a flat file on a file system or object storage. Therefore, all three options are incorrect.
+**❌ Неправильні варіанти:**
+- *Encrypted table in RDS* — тримати облікові дані в базі даних — погана практика.
+- *Encrypted file in S3* — тримати облікові дані у файлі в об'єктному сховищі — погана практика.
+- *Local code variable* — тримати облікові дані в коді — погана практика.
 
 Джерела: <https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html> · <https://aws.amazon.com/blogs/security/improve-availability-and-latency-of-applications-by-using-aws-secret-managers-python-client-side-caching-library/>
 
@@ -281,7 +226,7 @@ It is considered a security bad practice to keep sensitive access credentials in
 
 <a id="t10-q14"></a>
 ### T10-Q14
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
+*домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
 
 A healthcare service wants to exchange patient data securely with a partner organization through an HTTP API endpoint provided by the partner. The healthcare service has the requisite API key for accessing the HTTP API. The service needs a solution to manage the API key through code.
 
@@ -292,23 +237,16 @@ Which method will fulfill these requirements with maximum security?
 - ✅ Use AWS Secrets Manager to store and retrieve the API key.
 - ▫️ Use Amazon DynamoDB to store the API key and retrieve it when needed.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Secrets Manager is a secrets management service that helps you protect access to your applications, services, and IT resources. This service enables you to easily rotate, manage, and retrieve API keys, database credentials, and other secrets throughout their lifecycle, making it the most secure option.
+**✅ Правильна відповідь: «Use AWS Secrets Manager to store and retrieve the API key.»**
 
-CORRECT: "Use AWS Secrets Manager to store and retrieve the API key" is the correct answer (as explained above.)
+Secrets Manager захищає доступ до застосунків, сервісів і ресурсів. Він ротує, керує й видає API-ключі, облікові дані до БД та інші секрети протягом усього їхнього життєвого циклу. Найбезпечніший варіант.
 
-INCORRECT: "Store the API key in the application code" is incorrect.
-
-Storing the API key directly in the application code is a security risk and could lead to unintended exposure of the key.
-
-INCORRECT: "Use Amazon DynamoDB to store the API key and retrieve it when needed" is incorrect.
-
-While Amazon DynamoDB could be used to store the API key, it does not provide the same level of security management and key rotation capabilities that AWS Secrets Manager offers.
-
-INCORRECT: "Store the API key in an environment variable on the application server" is incorrect.
-
-Storing the API key in an environment variable on the application server could lead to unintentional exposure of the key if the environment variables were logged or leaked in some way.
+**❌ Неправильні варіанти:**
+- *In application code* — ризик витоку ключа.
+- *DynamoDB* — немає такого керування безпекою і ротації, як у Secrets Manager.
+- *Environment variable on the server* — може витекти через логи чи інші канали.
 
 Джерела: <https://aws.amazon.com/secrets-manager/>
 
@@ -318,7 +256,7 @@ Storing the API key in an environment variable on the application server could l
 
 <a id="t10-q61"></a>
 ### T10-Q61
-*⏭ пропущено · домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
+*домен: визначено автоматично (у джерелі: AWS Security, Identity, & Compliance)*
 
 An organization is developing a data processing application that is hosted on AWS Lambda and utilizes a PostgreSQL database on Amazon RDS. The security team mandates a policy that requires rotating database credentials every week.
 
@@ -329,23 +267,16 @@ What strategy should the developer adopt to manage the database credentials for 
 - ▫️ Store database credentials in Amazon S3 buckets with versioning enabled, rotating, and uploading new credentials weekly.
 - ▫️ Store the credentials in environment variables of the Lambda function and manually update them every week.
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-AWS Secrets Manager enables the creation, retrieval, and rotation of secrets like database credentials. Configuring automatic rotation weekly satisfies the security team's requirement, with the least manual effort.
+**✅ Правильна відповідь: «Deploy AWS Secrets Manager to store database credentials and set up automatic weekly rotation.»**
 
-CORRECT: "Deploy AWS Secrets Manager to store database credentials and set up automatic weekly rotation" is the correct answer (as explained above.)
+Secrets Manager створює, видає й ротує секрети, зокрема облікові дані до БД. Автоматична щотижнева ротація задовольняє вимогу безпеки з мінімумом ручної роботи.
 
-INCORRECT: "Store database credentials in Amazon S3 buckets with versioning enabled, rotating and uploading new credentials weekly" is incorrect.
-
-Storing credentials in Amazon S3 is not a secure practice as it does not have built-in mechanisms for rotating secrets.
-
-INCORRECT: "Enable IAM database authentication and manage weekly rotation manually" is incorrect.
-
-IAM database authentication allows you to use IAM users/roles to access your database, but it does not have an automatic mechanism for weekly rotation of IAM credentials.
-
-INCORRECT: "Store the credentials in environment variables of the Lambda function and manually update them every week" is incorrect.
-
-Storing credentials as environment variables in AWS Lambda functions could expose them to potential security risks, and manual rotation weekly would be labor-intensive.
+**❌ Неправильні варіанти:**
+- *S3 with versioning* — небезпечно, і вбудованої ротації немає.
+- *IAM DB auth + manual rotation* — IAM DB auth використовує токени, і автоматичної ротації в такій постановці немає.
+- *Lambda env vars + manual update* — ризик витоку і багато ручної роботи.
 
 Джерела: <https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotate-secrets_managed.html>
 
@@ -355,7 +286,7 @@ Storing credentials as environment variables in AWS Lambda functions could expos
 
 <a id="t11-q31"></a>
 ### T11-Q31
-*⏭ пропущено · домен: офіційна мітка*
+*домен: офіційна мітка*
 
 You are running workloads on AWS and have embedded RDS database connection strings within each web server hosting your applications. After failing a security audit, you are looking at a different approach to store your secrets securely and automatically rotate the database credentials.
 
@@ -366,23 +297,18 @@ Which AWS service can you use to address this use-case?
 - ▫️ KMS
 - ▫️ SSM Parameter Store
 
-<details><summary>Пояснення (оригінал, EN)</summary>
+<details><summary>Пояснення</summary>
 
-Correct option:
+**✅ Правильна відповідь: «Secrets Manager»**
 
-Secrets Manager
+Secrets Manager ротує, керує й видає облікові дані до БД, API-ключі та інші секрети протягом їх життєвого циклу. Застосунки отримують секрети через API, тож нічого не зберігається в коді. Вбудована ротація для RDS, Redshift і DocumentDB.
 
-AWS Secrets Manager enables you to easily rotate, manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle. Users and applications retrieve secrets with a call to Secrets Manager APIs, eliminating the need to hardcode sensitive information in plain text. Secrets Manager offers secret rotation with built-in integration for Amazon RDS, Amazon Redshift, and Amazon DocumentDB.
+Переваги: https://aws.amazon.com/secrets-manager/
 
-Benefits of Secrets Manager:  via - https://aws.amazon.com/secrets-manager/
-
-Incorrect options:
-
-SSM Parameter Store - AWS Systems Manager Parameter Store provides secure, hierarchical storage for configuration data management and secrets management. You can store data such as passwords, database strings, and license codes as parameter values. SSM Parameter Store cannot be used to automatically rotate the database credentials.
-
-Systems Manager - AWS Systems Manager gives you visibility and control of your infrastructure on AWS. Systems Manager provides a unified user interface so you can view operational data from multiple AWS services and allows you to automate operational tasks across your AWS resources. Systems Manager cannot be used to store your secrets securely and automatically rotate the database credentials.
-
-KMS - AWS Key Management Service (KMS) makes it easy for you to create and manage cryptographic keys and control their use across a wide range of AWS services and in your applications. KMS cannot be used to store your secrets securely and automatically rotate the database credentials.
+**❌ Неправильні варіанти:**
+- *SSM Parameter Store* — безпечне ієрархічне сховище конфігурацій і секретів, але автоматичної ротації облікових даних до БД немає.
+- *Systems Manager* — дає видимість і контроль над інфраструктурою; ротації секретів немає.
+- *KMS* — керує ключами шифрування, а не секретами.
 
 Джерела: <https://aws.amazon.com/secrets-manager/> · <https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html>
 
